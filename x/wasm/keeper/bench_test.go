@@ -9,6 +9,7 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/line/lbm-sdk/crypto/keys/secp256k1"
+	sdk "github.com/line/lbm-sdk/types"
 
 	"github.com/line/wasmd/x/wasm/types"
 )
@@ -80,6 +81,43 @@ func BenchmarkInstantiationOverhead(b *testing.B) {
 			}
 		})
 	}
+}
+
+func BenchmarkAPI(b *testing.B) {
+	wasmConfig := types.WasmConfig{MemoryCacheSize: 0}
+	ctx, keepers := createTestInput(b, false, SupportedFeatures, nil, nil, wasmConfig, dbm.NewMemDB())
+	example := InstantiateHackatomExampleContract(b, ctx, keepers)
+	api := keepers.WasmKeeper.cosmwasmAPI(ctx)
+	addrStr := example.Contract.String()
+	addrBytes, err := sdk.AccAddressFromBech32(example.Contract.String())
+	require.NoError(b, err)
+
+	b.Run("GetContractEnv", func(b *testing.B) {
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_, _, _, _, _, _, _, _, err := api.GetContractEnv(addrStr, 0)
+			require.NoError(b, err)
+		}
+	})
+
+	b.Run("CanonicalAddress", func(b *testing.B) {
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_, _, err := api.CanonicalAddress(addrStr)
+			require.NoError(b, err)
+		}
+	})
+
+	b.Run("HumanAddress", func(b *testing.B) {
+		b.ReportAllocs()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			_, _, err := api.HumanAddress(addrBytes)
+			require.NoError(b, err)
+		}
+	})
 }
 
 // Calculate the time it takes to compile some wasm code the first time.
