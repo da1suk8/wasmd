@@ -25,9 +25,6 @@ message GenesisState {
     (gogoproto.jsontag) = "gen_msgs,omitempty"
   ];
 
-  // InactiveContractAddresses is a list of contract address that set inactive
-  repeated string inactive_contract_addresses = 6 [(gogoproto.jsontag) = "inactive_contract_address, omitempty"];
-
   // GenMsgs define the messages that can be executed during genesis phase in
   // order. The intention is to have more human readable data that is auditable.
   message GenMsgs {
@@ -36,6 +33,8 @@ message GenesisState {
       MsgStoreCode store_code = 1;
       MsgInstantiateContract instantiate_contract = 2;
       MsgExecuteContract execute_contract = 3;
+      // MsgInstantiateContract2 intentionally not supported
+      // see https://github.com/CosmWasm/wasmd/issues/987
     }
   }
 }
