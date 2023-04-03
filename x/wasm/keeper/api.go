@@ -2,7 +2,9 @@ package keeper
 
 import (
 	sdk "github.com/line/lbm-sdk/types"
-	"github.com/line/lbm-sdk/x/wasm/types"
+	"github.com/line/wasmd/x/wasm/types"
+	wasmplustypes "github.com/line/wasmd/x/wasmplus/types"
+
 	wasmvm "github.com/line/wasmvm"
 	wasmvmtypes "github.com/line/wasmvm/types"
 )
@@ -42,14 +44,13 @@ func canonicalAddress(human string) ([]byte, uint64, error) {
 	bz, err := sdk.AccAddressFromBech32(human)
 	return bz, costCanonical, err
 }
+
 func (a cosmwasmAPIImpl) getContractEnv(contractAddrStr string, inputSize uint64) (wasmvm.Env, *wasmvm.Cache, wasmvm.KVStore, wasmvm.Querier, wasmvm.GasMeter, []byte, uint64, uint64, error) {
 	contractAddr := sdk.MustAccAddressFromBech32(contractAddrStr)
-	contractInfo, codeInfo, prefixStore, err := a.keeper.contractInstance(*a.ctx, contractAddr)
+	_, codeInfo, prefixStore, err := a.keeper.contractInstance(*a.ctx, contractAddr)
 	if err != nil {
 		return wasmvm.Env{}, nil, nil, nil, nil, wasmvm.Checksum{}, 0, 0, err
 	}
-
-	gasMultiplier := a.keeper.getGasMultiplier(*a.ctx)
 
 	cache := a.keeper.wasmVM.GetCache()
 	if cache == nil {
@@ -57,17 +58,12 @@ func (a cosmwasmAPIImpl) getContractEnv(contractAddrStr string, inputSize uint64
 	}
 
 	// prepare querier
-	querier := NewQueryHandler(*a.ctx, a.keeper.wasmVMQueryHandler, contractAddr, gasMultiplier)
+	querier := NewQueryHandler(*a.ctx, a.keeper.wasmVMQueryHandler, contractAddr, NewDefaultWasmGasRegister())
 
-	// this gas cost is temporal value defined by
-	// https://github.com/line/lbm-sdk/runs/8150140720?check_suite_focus=true#step:5:483
-	// Before release, it is adjusted by benchmark taken in environment similar to the nodes.
-	gas := gasMultiplier.ToWasmVMGas(11)
-	instantiateCost := gasMultiplier.ToWasmVMGas(a.keeper.instantiateContractCosts(a.keeper.gasRegister, *a.ctx, a.keeper.IsPinnedCode(*a.ctx, contractInfo.CodeID), int(inputSize)))
-	wasmStore := types.NewWasmStore(prefixStore)
+	wasmStore := wasmplustypes.NewWasmStore(prefixStore)
 	env := types.NewEnv(*a.ctx, contractAddr)
 
-	return env, cache, wasmStore, querier, a.keeper.gasMeter(*a.ctx), codeInfo.CodeHash, instantiateCost, gas, nil
+	return env, cache, wasmStore, querier, a.keeper.gasMeter(*a.ctx), codeInfo.CodeHash, DefaultInstanceCost, 0, nil
 }
 
 func (k Keeper) cosmwasmAPI(ctx sdk.Context) wasmvm.GoAPI {
@@ -76,13 +72,8 @@ func (k Keeper) cosmwasmAPI(ctx sdk.Context) wasmvm.GoAPI {
 		ctx:    &ctx,
 	}
 	return wasmvm.GoAPI{
-		HumanAddress:     x.humanAddress,
-		CanonicalAddress: x.canonicalAddress,
+		HumanAddress:     humanAddress,
+		CanonicalAddress: canonicalAddress,
 		GetContractEnv:   x.getContractEnv,
 	}
-}
-
-var cosmwasmAPI = wasmvm.GoAPI{
-	HumanAddress:     humanAddress,
-	CanonicalAddress: canonicalAddress,
 }
