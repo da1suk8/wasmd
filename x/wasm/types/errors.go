@@ -55,7 +55,7 @@ var (
 	// ErrMaxIBCChannels error for maximum number of ibc channels reached
 	ErrMaxIBCChannels = sdkErrors.Register(DefaultCodespace, 16, "max transfer channels")
 
-	// ErrUnsupportedForContract error when a feature is used that is not supported for/ by this contract
+	// ErrUnsupportedForContract error when a capability is used that is not supported for/ by this contract
 	ErrUnsupportedForContract = sdkErrors.Register(DefaultCodespace, 17, "unsupported for this contract")
 
 	// ErrPinContractFailed error for pinning contract failures
@@ -87,9 +87,6 @@ var (
 
 	// ErrExceedMaxQueryStackSize error if max query stack size is exceeded
 	ErrExceedMaxQueryStackSize = sdkErrors.Register(DefaultCodespace, 27, "max query stack size exceeded")
-
-	// ErrInactiveContract error if the contract set inactive
-	ErrInactiveContract = sdkErrors.Register(DefaultCodespace, 101, "inactive contract")
 )
 
 type ErrNoSuchContract struct {

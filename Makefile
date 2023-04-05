@@ -82,7 +82,7 @@ build: go.sum
 ifeq ($(OS),Windows_NT)
 	exit 1
 else
-	go build -mod=readonly $(BUILD_FLAGS) -o build/wasmd ./cmd/wasmd
+	go build -mod=readonly $(BUILD_FLAGS) -o build/wasmd ./cmd/wasmplusd
 endif
 
 build-contract-tests-hooks:
@@ -93,7 +93,8 @@ else
 endif
 
 install: go.sum
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/wasmd
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/wasmplusd
+	mv $(BINDIR)/wasmplusd $(BINDIR)/wasmd
 
 ########################################
 ### Tools & dependencies
@@ -108,7 +109,7 @@ go.sum: go.mod
 
 draw-deps:
 	@# requires brew install graphviz or apt-get install graphviz
-	go get github.com/RobotsAndPencils/goviz
+	go install github.com/RobotsAndPencils/goviz@latest
 	@goviz -i ./cmd/wasmd -d 2 | dot -Tpng -o dependency-graph.png
 
 clean:
@@ -166,7 +167,7 @@ format: format-tools
 ###                                Protobuf                                 ###
 ###############################################################################
 PROTO_VERSION=v0.2
-PROTO_BUILDER_IMAGE=tendermintdev/sdk-proto-gen@sha256:372dce7be2f465123e26459973ca798fc489ff2c75aeecd814c0ca8ced24faca
+PROTO_BUILDER_IMAGE=tendermintdev/sdk-proto-gen:$(PROTO_VERSION)
 PROTO_FORMATTER_IMAGE=tendermintdev/docker-build-proto@sha256:aabcfe2fc19c31c0f198d4cd26393f5e5ca9502d7ea3feafbfe972448fee7cae
 PROTO_GEN_SWAGGER_IMAGE=cosmos-sdk-proto-gen-swagger-$(PROTO_VERSION)
 

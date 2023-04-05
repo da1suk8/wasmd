@@ -1,12 +1,15 @@
 package keeper
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	authkeeper "github.com/line/lbm-sdk/x/auth/keeper"
+	authtypes "github.com/line/lbm-sdk/x/auth/types"
+	vestingtypes "github.com/line/lbm-sdk/x/auth/vesting/types"
 	bankpluskeeper "github.com/line/lbm-sdk/x/bankplus/keeper"
 	distributionkeeper "github.com/line/lbm-sdk/x/distribution/keeper"
 	paramtypes "github.com/line/lbm-sdk/x/params/types"
@@ -63,18 +66,52 @@ func TestConstructorOptions(t *testing.T) {
 				assert.IsType(t, &wasmtesting.MockCoinTransferrer{}, k.bank)
 			},
 		},
+		"costs": {
+			srcOpt: WithGasRegister(&wasmtesting.MockGasRegister{}),
+			verify: func(t *testing.T, k Keeper) {
+				assert.IsType(t, &wasmtesting.MockGasRegister{}, k.gasRegister)
+			},
+		},
+		"api costs": {
+			srcOpt: WithAPICosts(1, 2),
+			verify: func(t *testing.T, k Keeper) {
+				t.Cleanup(setApiDefaults)
+				assert.Equal(t, uint64(1), costHumanize)
+				assert.Equal(t, uint64(2), costCanonical)
+			},
+		},
 		"max recursion query limit": {
 			srcOpt: WithMaxQueryStackSize(1),
 			verify: func(t *testing.T, k Keeper) {
 				assert.IsType(t, uint32(1), k.maxQueryStackSize)
 			},
 		},
+		"accepted account types": {
+			srcOpt: WithAcceptedAccountTypesOnContractInstantiation(&authtypes.BaseAccount{}, &vestingtypes.ContinuousVestingAccount{}),
+			verify: func(t *testing.T, k Keeper) {
+				exp := map[reflect.Type]struct{}{
+					reflect.TypeOf(&authtypes.BaseAccount{}):                 {},
+					reflect.TypeOf(&vestingtypes.ContinuousVestingAccount{}): {},
+				}
+				assert.Equal(t, exp, k.acceptedAccountTypes)
+			},
+		},
+		"account pruner": {
+			srcOpt: WithAccountPruner(VestingCoinBurner{}),
+			verify: func(t *testing.T, k Keeper) {
+				assert.Equal(t, VestingCoinBurner{}, k.accountPruner)
+			},
+		},
 	}
 	for name, spec := range specs {
 		t.Run(name, func(t *testing.T) {
-			k := NewKeeper(nil, nil, paramtypes.NewSubspace(nil, nil, nil, nil, ""), authkeeper.AccountKeeper{}, bankpluskeeper.BaseKeeper{}, stakingkeeper.Keeper{}, distributionkeeper.Keeper{}, nil, nil, nil, nil, nil, nil, "tempDir", types.DefaultWasmConfig(), SupportedFeatures, nil, nil, spec.srcOpt)
+			k := NewKeeper(nil, nil, paramtypes.NewSubspace(nil, nil, nil, nil, ""), authkeeper.AccountKeeper{}, bankpluskeeper.BaseKeeper{}, stakingkeeper.Keeper{}, distributionkeeper.Keeper{}, nil, nil, nil, nil, nil, nil, "tempDir", types.DefaultWasmConfig(), AvailableCapabilities, spec.srcOpt)
 			spec.verify(t, k)
 		})
 	}
+}
 
+func setApiDefaults() {
+	costHumanize = DefaultGasCostHumanAddress * DefaultGasMultiplier
+	costCanonical = DefaultGasCostCanonicalAddress * DefaultGasMultiplier
 }

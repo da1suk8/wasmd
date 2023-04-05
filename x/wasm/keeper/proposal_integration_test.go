@@ -18,59 +18,70 @@ import (
 	wasmvm "github.com/line/wasmvm"
 
 	"github.com/line/wasmd/x/wasm/keeper/wasmtesting"
-	"github.com/line/wasmd/x/wasm/lbmtypes"
 	"github.com/line/wasmd/x/wasm/types"
 )
 
 func TestStoreCodeProposal(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
+	parentCtx, keepers := CreateTestInput(t, false, "staking")
 	govKeeper, wasmKeeper := keepers.GovKeeper, keepers.WasmKeeper
-	wasmKeeper.SetParams(ctx, types.Params{
+	wasmKeeper.SetParams(parentCtx, types.Params{
 		CodeUploadAccess:             types.AllowNobody,
 		InstantiateDefaultPermission: types.AccessTypeNobody,
-		GasMultiplier:                types.DefaultGasMultiplier,
-		InstanceCost:                 types.DefaultInstanceCost,
-		CompileCost:                  types.DefaultCompileCost,
 	})
 	wasmCode, err := os.ReadFile("./testdata/hackatom.wasm")
 	require.NoError(t, err)
 
-	myActorAddress := RandomBech32AccountAddress(t)
+	specs := map[string]struct {
+		codeID    int64
+		unpinCode bool
+	}{
+		"upload with pinning (default)": {
+			unpinCode: false,
+		},
+		"upload with code unpin": {
+			unpinCode: true,
+		},
+	}
 
-	src := types.StoreCodeProposalFixture(func(p *types.StoreCodeProposal) {
-		p.RunAs = myActorAddress
-		p.WASMByteCode = wasmCode
-	})
+	for msg, spec := range specs {
+		t.Run(msg, func(t *testing.T) {
+			ctx, _ := parentCtx.CacheContext()
+			myActorAddress := RandomBech32AccountAddress(t)
 
-	// when stored
-	storedProposal, err := govKeeper.SubmitProposal(ctx, src)
-	require.NoError(t, err)
+			src := types.StoreCodeProposalFixture(func(p *types.StoreCodeProposal) {
+				p.RunAs = myActorAddress
+				p.WASMByteCode = wasmCode
+				p.UnpinCode = spec.unpinCode
+			})
 
-	// and proposal execute
-	handler := govKeeper.Router().GetRoute(storedProposal.ProposalRoute())
-	err = handler(ctx, storedProposal.GetContent())
-	require.NoError(t, err)
+			// when stored
+			storedProposal, err := govKeeper.SubmitProposal(ctx, src)
+			require.NoError(t, err)
 
-	// then
-	cInfo := wasmKeeper.GetCodeInfo(ctx, 1)
-	require.NotNil(t, cInfo)
-	assert.Equal(t, myActorAddress, cInfo.Creator)
-	assert.True(t, wasmKeeper.IsPinnedCode(ctx, 1))
+			// and proposal execute
+			handler := govKeeper.Router().GetRoute(storedProposal.ProposalRoute())
+			err = handler(ctx, storedProposal.GetContent())
+			require.NoError(t, err)
 
-	storedCode, err := wasmKeeper.GetByteCode(ctx, 1)
-	require.NoError(t, err)
-	assert.Equal(t, wasmCode, storedCode)
+			// then
+			cInfo := wasmKeeper.GetCodeInfo(ctx, 1)
+			require.NotNil(t, cInfo)
+			assert.Equal(t, myActorAddress, cInfo.Creator)
+			assert.Equal(t, !spec.unpinCode, wasmKeeper.IsPinnedCode(ctx, 1))
+
+			storedCode, err := wasmKeeper.GetByteCode(ctx, 1)
+			require.NoError(t, err)
+			assert.Equal(t, wasmCode, storedCode)
+		})
+	}
 }
 
 func TestInstantiateProposal(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
+	ctx, keepers := CreateTestInput(t, false, "staking")
 	govKeeper, wasmKeeper := keepers.GovKeeper, keepers.WasmKeeper
 	wasmKeeper.SetParams(ctx, types.Params{
 		CodeUploadAccess:             types.AllowNobody,
 		InstantiateDefaultPermission: types.AccessTypeNobody,
-		GasMultiplier:                types.DefaultGasMultiplier,
-		InstanceCost:                 types.DefaultInstanceCost,
-		CompileCost:                  types.DefaultCompileCost,
 	})
 
 	wasmCode, err := os.ReadFile("./testdata/hackatom.wasm")
@@ -131,14 +142,11 @@ func TestInstantiateProposal(t *testing.T) {
 }
 
 func TestInstantiateProposal_NoAdmin(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
+	ctx, keepers := CreateTestInput(t, false, "staking")
 	govKeeper, wasmKeeper := keepers.GovKeeper, keepers.WasmKeeper
 	wasmKeeper.SetParams(ctx, types.Params{
 		CodeUploadAccess:             types.AllowNobody,
 		InstantiateDefaultPermission: types.AccessTypeNobody,
-		GasMultiplier:                types.DefaultGasMultiplier,
-		InstanceCost:                 types.DefaultInstanceCost,
-		CompileCost:                  types.DefaultCompileCost,
 	})
 
 	wasmCode, err := os.ReadFile("./testdata/hackatom.wasm")
@@ -206,14 +214,11 @@ func TestInstantiateProposal_NoAdmin(t *testing.T) {
 }
 
 func TestMigrateProposal(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
+	ctx, keepers := CreateTestInput(t, false, "staking")
 	govKeeper, wasmKeeper := keepers.GovKeeper, keepers.WasmKeeper
 	wasmKeeper.SetParams(ctx, types.Params{
 		CodeUploadAccess:             types.AllowNobody,
 		InstantiateDefaultPermission: types.AccessTypeNobody,
-		GasMultiplier:                types.DefaultGasMultiplier,
-		InstanceCost:                 types.DefaultInstanceCost,
-		CompileCost:                  types.DefaultCompileCost,
 	})
 
 	wasmCode, err := os.ReadFile("./testdata/hackatom.wasm")
@@ -224,9 +229,9 @@ func TestMigrateProposal(t *testing.T) {
 	require.NoError(t, wasmKeeper.importCode(ctx, 2, codeInfoFixture, wasmCode))
 
 	var (
-		anyAddress   sdk.AccAddress = bytes.Repeat([]byte{0x1}, types.ContractAddrLen)
-		otherAddress sdk.AccAddress = bytes.Repeat([]byte{0x2}, types.ContractAddrLen)
-		contractAddr                = BuildContractAddress(1, 1)
+		anyAddress   = DeterministicAccountAddress(t, 1)
+		otherAddress = DeterministicAccountAddress(t, 2)
+		contractAddr = BuildContractAddressClassic(1, 1)
 	)
 
 	contractInfoFixture := types.ContractInfoFixture(func(c *types.ContractInfo) {
@@ -290,7 +295,7 @@ func TestMigrateProposal(t *testing.T) {
 }
 
 func TestExecuteProposal(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
+	ctx, keepers := CreateTestInput(t, false, "staking")
 	govKeeper, bankKeeper := keepers.GovKeeper, keepers.BankKeeper
 
 	exampleContract := InstantiateHackatomExampleContract(t, ctx, keepers)
@@ -350,7 +355,7 @@ func TestExecuteProposal(t *testing.T) {
 }
 
 func TestSudoProposal(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
+	ctx, keepers := CreateTestInput(t, false, "staking")
 	govKeeper, bankKeeper := keepers.GovKeeper, keepers.BankKeeper
 
 	exampleContract := InstantiateHackatomExampleContract(t, ctx, keepers)
@@ -405,7 +410,7 @@ func TestSudoProposal(t *testing.T) {
 func TestAdminProposals(t *testing.T) {
 	var (
 		otherAddress sdk.AccAddress = bytes.Repeat([]byte{0x2}, types.ContractAddrLen)
-		contractAddr                = BuildContractAddress(1, 1)
+		contractAddr                = BuildContractAddressClassic(1, 1)
 	)
 	wasmCode, err := os.ReadFile("./testdata/hackatom.wasm")
 	require.NoError(t, err)
@@ -460,14 +465,11 @@ func TestAdminProposals(t *testing.T) {
 	}
 	for msg, spec := range specs {
 		t.Run(msg, func(t *testing.T) {
-			ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
+			ctx, keepers := CreateTestInput(t, false, "staking")
 			govKeeper, wasmKeeper := keepers.GovKeeper, keepers.WasmKeeper
 			wasmKeeper.SetParams(ctx, types.Params{
 				CodeUploadAccess:             types.AllowNobody,
 				InstantiateDefaultPermission: types.AccessTypeNobody,
-				GasMultiplier:                types.DefaultGasMultiplier,
-				InstanceCost:                 types.DefaultInstanceCost,
-				CompileCost:                  types.DefaultCompileCost,
 			})
 
 			codeInfoFixture := types.CodeInfoFixture(types.WithSHA256CodeHash(wasmCode))
@@ -492,7 +494,7 @@ func TestAdminProposals(t *testing.T) {
 }
 
 func TestUpdateParamsProposal(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
+	ctx, keepers := CreateTestInput(t, false, "staking")
 	govKeeper, wasmKeeper := keepers.GovKeeper, keepers.WasmKeeper
 
 	var (
@@ -589,7 +591,7 @@ func TestUpdateParamsProposal(t *testing.T) {
 }
 
 func TestPinCodesProposal(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
+	ctx, keepers := CreateTestInput(t, false, "staking")
 	govKeeper, wasmKeeper := keepers.GovKeeper, keepers.WasmKeeper
 
 	mock := wasmtesting.MockWasmer{
@@ -677,7 +679,7 @@ func TestPinCodesProposal(t *testing.T) {
 }
 
 func TestUnpinCodesProposal(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
+	ctx, keepers := CreateTestInput(t, false, "staking")
 	govKeeper, wasmKeeper := keepers.GovKeeper, keepers.WasmKeeper
 
 	mock := wasmtesting.MockWasmer{
@@ -765,7 +767,7 @@ func TestUnpinCodesProposal(t *testing.T) {
 }
 
 func TestUpdateInstantiateConfigProposal(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
+	ctx, keepers := CreateTestInput(t, false, "staking")
 	govKeeper, wasmKeeper := keepers.GovKeeper, keepers.WasmKeeper
 
 	mock := wasmtesting.MockWasmer{
@@ -856,67 +858,4 @@ func TestUpdateInstantiateConfigProposal(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestValidateDeactivateContractProposal(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
-	govKeeper, wasmKeeper := keepers.GovKeeper, keepers.WasmKeeper
-
-	var mock wasmtesting.MockWasmer
-	wasmtesting.MakeInstantiable(&mock)
-	example := SeedNewContractInstance(t, ctx, keepers, &mock)
-
-	src := lbmtypes.DeactivateContractProposal{
-		Title:       "Foo",
-		Description: "Bar",
-		Contract:    example.Contract.String(),
-	}
-
-	em := sdk.NewEventManager()
-
-	// when stored
-	storedProposal, err := govKeeper.SubmitProposal(ctx, &src)
-	require.NoError(t, err)
-
-	// proposal execute
-	handler := govKeeper.Router().GetRoute(storedProposal.ProposalRoute())
-	err = handler(ctx.WithEventManager(em), storedProposal.GetContent())
-	require.NoError(t, err)
-
-	// then
-	isInactive := wasmKeeper.IsInactiveContract(ctx, example.Contract)
-	require.True(t, isInactive)
-}
-
-func TestActivateContractProposal(t *testing.T) {
-	ctx, keepers := CreateTestInput(t, false, "staking", nil, nil)
-	govKeeper, wasmKeeper := keepers.GovKeeper, keepers.WasmKeeper
-
-	var mock wasmtesting.MockWasmer
-	wasmtesting.MakeInstantiable(&mock)
-	example := SeedNewContractInstance(t, ctx, keepers, &mock)
-	// set deactivate
-	err := wasmKeeper.deactivateContract(ctx, example.Contract)
-	require.NoError(t, err)
-
-	src := lbmtypes.ActivateContractProposal{
-		Title:       "Foo",
-		Description: "Bar",
-		Contract:    example.Contract.String(),
-	}
-
-	em := sdk.NewEventManager()
-
-	// when stored
-	storedProposal, err := govKeeper.SubmitProposal(ctx, &src)
-	require.NoError(t, err)
-
-	// proposal execute
-	handler := govKeeper.Router().GetRoute(storedProposal.ProposalRoute())
-	err = handler(ctx.WithEventManager(em), storedProposal.GetContent())
-	require.NoError(t, err)
-
-	// then
-	isInactive := wasmKeeper.IsInactiveContract(ctx, example.Contract)
-	require.False(t, isInactive)
 }
