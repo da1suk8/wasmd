@@ -1,13 +1,37 @@
 # Changelog
 
-## [Unreleased](https://github.com/line/wasmd/tree/HEAD)
+## [Unreleased](https://github.com/line/wasmd/compare/v0.1.0...HEAD)
+
+### Features
+
+### Improvements
+
+### Bug Fixes
+
+### Breaking Changes
+
+### Build, CI
+
+### Document Updates
+
+
+
+## [v0.1.0](https://github.com/line/wasmd/releases/tag/v0.1.0) - 2023.03.28
+
+### Features
+* [\#9](https://github.com/line/wasmd/pull/9) apply the changes of lbm-sdk and ostracon proto
+* [\#21](https://github.com/line/wasmd/pull/21) bump up line/ibc-go v3.3.2
 
 ### Improvements
 * [\#1](https://github.com/line/wasmd/pull/1) apply all changes of `x/wasm` in lbm-sdk until [lbm-sdk@3bdcb6ffe01c81615bedb777ca0e039cc46ef00c](https://github.com/line/lbm-sdk/tree/3bdcb6ffe01c81615bedb777ca0e039cc46ef00c)
 * [\#5](https://github.com/line/wasmd/pull/5) bump up wasmd v0.29.1
 * [\#7](https://github.com/line/wasmd/pull/7) separate custom features in `x/wasm` into `x/wasmplus` module
+* [\#8](https://github.com/line/wasmd/pull/8) Bump line/lbm-sdk to a7557b1d10
+* [\#10](https://github.com/line/wasmd/pull/10) update wasmvm version
 
 ### Bug Fixes
+* [\#12](https://github.com/line/wasmd/pull/12) fix not to register wrong codec in `x/wasmplus`
+* [\#14](https://github.com/line/wasmd/pull/14) fix the cmd error that does not recognize wasmvm library version
 
 ### Breaking Changes
 
