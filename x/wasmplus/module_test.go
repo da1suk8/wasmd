@@ -19,6 +19,7 @@ import (
 	"github.com/line/ostracon/crypto"
 	"github.com/line/ostracon/crypto/ed25519"
 
+	"github.com/line/wasmd/x/wasm"
 	wasmkeeper "github.com/line/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/line/wasmd/x/wasm/types"
 	"github.com/line/wasmd/x/wasmplus/keeper"
@@ -35,11 +36,36 @@ type testData struct {
 	faucet        *wasmkeeper.TestFaucet
 }
 
+type testData_for_dynamiclink struct {
+	module        module.AppModule
+	ctx           sdk.Context
+	acctKeeper    authkeeper.AccountKeeper
+	keeper        wasmkeeper.Keeper
+	bankKeeper    bankkeeper.Keeper
+	stakingKeeper stakingkeeper.Keeper
+	faucet        *wasmkeeper.TestFaucet
+}
+
 func setupTest(t *testing.T) testData {
 	ctx, keepers := keeper.CreateTestInput(t, false, "iterator,staking,stargate,cosmwasm_1_1")
 	cdc := wasmkeeper.MakeTestCodec(t)
 	data := testData{
 		module:        NewAppModule(cdc, keepers.WasmKeeper, keepers.StakingKeeper, keepers.AccountKeeper, keepers.BankKeeper),
+		ctx:           ctx,
+		acctKeeper:    keepers.AccountKeeper,
+		keeper:        *keepers.WasmKeeper,
+		bankKeeper:    keepers.BankKeeper,
+		stakingKeeper: keepers.StakingKeeper,
+		faucet:        keepers.Faucet,
+	}
+	return data
+}
+
+func setupTest_for_dynamiclink(t *testing.T) testData_for_dynamiclink {
+	ctx, keepers := wasmkeeper.CreateTestInput(t, false, "iterator,staking,stargate,cosmwasm_1_1")
+	cdc := wasmkeeper.MakeTestCodec(t)
+	data := testData_for_dynamiclink{
+		module:        wasm.NewAppModule(cdc, keepers.WasmKeeper, keepers.StakingKeeper, keepers.AccountKeeper, keepers.BankKeeper),
 		ctx:           ctx,
 		acctKeeper:    keepers.AccountKeeper,
 		keeper:        *keepers.WasmKeeper,

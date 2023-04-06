@@ -1,13 +1,13 @@
-package wasm
+package wasmplus
 
 import (
 	"fmt"
 	"testing"
 
-	abci "github.com/line/ostracon/abci/types"
 	"github.com/line/wasmd/x/wasm/keeper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 var (
@@ -22,7 +22,7 @@ var (
 // This tests dynamic calls using callee_contract's pong
 func TestDynamicPingPongWorks(t *testing.T) {
 	// setup
-	data := setupTest(t)
+	data := setupTest_for_dynamiclink(t)
 
 	h := data.module.Route().Handler()
 
@@ -99,7 +99,7 @@ func TestDynamicPingPongWorks(t *testing.T) {
 // This tests re-entrancy in dynamic call fails
 func TestDynamicReEntrancyFails(t *testing.T) {
 	// setup
-	data := setupTest(t)
+	data := setupTest_for_dynamiclink(t)
 
 	h := data.module.Route().Handler()
 
@@ -166,7 +166,7 @@ func TestDynamicReEntrancyFails(t *testing.T) {
 
 func TestDynamicLinkInterfaceValidation(t *testing.T) {
 	// setup
-	data := setupTest(t)
+	data := setupTest_for_dynamiclink(t)
 
 	h := data.module.Route().Handler()
 
@@ -246,7 +246,7 @@ func TestDynamicLinkInterfaceValidation(t *testing.T) {
 // in a contract call
 func TestDynamicCallAndTraditionalQueryWork(t *testing.T) {
 	// setup
-	data := setupTest(t)
+	data := setupTest_for_dynamiclink(t)
 
 	h := data.module.Route().Handler()
 	q := data.module.LegacyQuerierHandler(nil)
@@ -346,7 +346,7 @@ func TestDynamicCallAndTraditionalQueryWork(t *testing.T) {
 // if it is called by a query
 func TestDynamicCallWithWriteFailsByQuery(t *testing.T) {
 	// setup
-	data := setupTest(t)
+	data := setupTest_for_dynamiclink(t)
 
 	h := data.module.Route().Handler()
 	q := data.module.LegacyQuerierHandler(nil)
@@ -414,7 +414,7 @@ func TestDynamicCallWithWriteFailsByQuery(t *testing.T) {
 // This tests callee_panic in dynamic call fails
 func TestDynamicCallCalleeFails(t *testing.T) {
 	// setup
-	data := setupTest(t)
+	data := setupTest_for_dynamiclink(t)
 
 	h := data.module.Route().Handler()
 
