@@ -83,9 +83,10 @@ func BenchmarkInstantiationOverhead(b *testing.B) {
 	}
 }
 
+// This section was added by dynamic link and differs from the original
 func BenchmarkAPI(b *testing.B) {
 	wasmConfig := types.WasmConfig{MemoryCacheSize: 0}
-	ctx, keepers := createTestInput(b, false, SupportedFeatures, nil, nil, wasmConfig, dbm.NewMemDB())
+	ctx, keepers := createTestInput(b, false, AvailableCapabilities, wasmConfig, dbm.NewMemDB())
 	example := InstantiateHackatomExampleContract(b, ctx, keepers)
 	api := keepers.WasmKeeper.cosmwasmAPI(ctx)
 	addrStr := example.Contract.String()
@@ -128,12 +129,15 @@ func BenchmarkCompilation(b *testing.B) {
 		db       func() dbm.DB
 	}{
 		"hackatom": {
+			db:       func() dbm.DB { return dbm.NewMemDB() },
 			wasmFile: "./testdata/hackatom.wasm",
 		},
 		"burner": {
+			db:       func() dbm.DB { return dbm.NewMemDB() },
 			wasmFile: "./testdata/burner.wasm",
 		},
 		"ibc_reflect": {
+			db:       func() dbm.DB { return dbm.NewMemDB() },
 			wasmFile: "./testdata/ibc_reflect.wasm",
 		},
 	}

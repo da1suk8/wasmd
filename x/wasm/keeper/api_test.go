@@ -6,16 +6,14 @@ import (
 	"testing"
 
 	sdk "github.com/line/lbm-sdk/types"
-	wasmtype "github.com/line/wasmd/x/wasm/types"
 	wasmvm "github.com/line/wasmvm"
-
 	wasmvmtypes "github.com/line/wasmvm/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func newAPI(t *testing.T) wasmvm.GoAPI {
-	ctx, keepers := CreateTestInput(t, false, SupportedFeatures, nil, nil)
+	ctx, keepers := CreateTestInput(t, false, AvailableCapabilities)
 	return keepers.WasmKeeper.cosmwasmAPI(ctx)
 }
 
@@ -31,19 +29,19 @@ func TestAPIHumanAddress(t *testing.T) {
 		result, gas, err := api.HumanAddress(bz)
 		require.NoError(t, err)
 		assert.Equal(t, addr, result)
-		assert.Equal(t, wasmtype.DefaultGasMultiplier*5, gas)
+		assert.Equal(t, costHumanize, gas)
 	})
 
 	t.Run("invalid address", func(t *testing.T) {
 		_, gas, err := api.HumanAddress([]byte("invalid_address"))
 		require.Error(t, err)
-		assert.Equal(t, wasmtype.DefaultGasMultiplier*5, gas)
+		assert.Equal(t, costHumanize, gas)
 	})
 }
 
 func TestAPICanonicalAddress(t *testing.T) {
-	// prepare API
-	api := newAPI(t)
+	ctx, keepers := CreateTestInput(t, false, AvailableCapabilities)
+	api:= keepers.WasmKeeper.cosmwasmAPI(ctx)
 
 	t.Run("valid address", func(t *testing.T) {
 		addr := "link1twsfmuj28ndph54k4nw8crwu8h9c8mh3rtx705"
@@ -52,27 +50,28 @@ func TestAPICanonicalAddress(t *testing.T) {
 		result, gas, err := api.CanonicalAddress(addr)
 		require.NoError(t, err)
 		assert.Equal(t, expected.Bytes(), result)
-		assert.Equal(t, wasmtype.DefaultGasMultiplier*4, gas)
+		assert.Equal(t, costCanonical, gas)
 	})
 
 	t.Run("invalid address", func(t *testing.T) {
 		_, gas, err := api.CanonicalAddress("invalid_address")
 		assert.Error(t, err)
-		assert.Equal(t, wasmtype.DefaultGasMultiplier*4, gas)
+		assert.Equal(t, costCanonical, gas)
 	})
 }
 
 func TestAPIGetContractEnv(t *testing.T) {
 	// prepare ctx and keeper
-	ctx, keepers := CreateTestInput(t, false, SupportedFeatures, nil, nil)
+	ctx, keepers := CreateTestInput(t, false, AvailableCapabilities)
 
 	// instantiate a number contract
 	numberWasm, err := ioutil.ReadFile("../testdata/number.wasm")
 	require.NoError(t, err)
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
-	creator := keepers.Faucet.NewFundedAccount(ctx, deposit...)
+	creator := keepers.Faucet.NewFundedRandomAccount(ctx, deposit...)
 	em := sdk.NewEventManager()
-	codeID, err := keepers.ContractKeeper.Create(ctx.WithEventManager(em), creator, numberWasm, nil)
+	codeID, _, err := keepers.ContractKeeper.Create(ctx.WithEventManager(em), creator, numberWasm, nil)
+	keepers.ContractKeeper.Create(ctx.WithEventManager(em), creator, numberWasm, nil)
 	require.NoError(t, err)
 	value := 42
 	initMsg := []byte(fmt.Sprintf(`{"value":%d}`, value))
@@ -110,10 +109,8 @@ func TestAPIGetContractEnv(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, []byte(`{"value":42}`), queryResult)
 
-		expectedInstantiateCost := keepers.WasmKeeper.instantiateContractCosts(keepers.WasmKeeper.gasRegister, ctx, false, msgLen)
-		assert.Equal(t, wasmtype.DefaultGasMultiplier*expectedInstantiateCost, instantiateCost)
-
-		assert.Equal(t, wasmtype.DefaultGasMultiplier*11, gas)
+		assert.Equal(t, DefaultInstanceCost, instantiateCost)
+		assert.Equal(t, uint64(0), gas)
 	})
 
 	t.Run("non-existed contract", func(t *testing.T) {
