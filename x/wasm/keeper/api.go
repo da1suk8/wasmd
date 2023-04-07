@@ -46,8 +46,8 @@ func canonicalAddress(human string) ([]byte, uint64, error) {
 }
 
 // This section was added by dynamic link and differs from the original
-// 
-// Since this function will disappear in the near future, DefaultInstanceCost is used and gas is set to 0 
+//
+// Since this function will disappear in the near future, DefaultInstanceCost is used and gas is set to 0
 func (a cosmwasmAPIImpl) getContractEnv(contractAddrStr string, inputSize uint64) (wasmvm.Env, *wasmvm.Cache, wasmvm.KVStore, wasmvm.Querier, wasmvm.GasMeter, []byte, uint64, uint64, error) {
 	contractAddr := sdk.MustAccAddressFromBech32(contractAddrStr)
 	_, codeInfo, prefixStore, err := a.keeper.contractInstance(*a.ctx, contractAddr)
@@ -62,7 +62,6 @@ func (a cosmwasmAPIImpl) getContractEnv(contractAddrStr string, inputSize uint64
 
 	// prepare querier
 	querier := NewQueryHandler(*a.ctx, a.keeper.wasmVMQueryHandler, contractAddr, NewDefaultWasmGasRegister())
-
 
 	wasmStore := wasmplustypes.NewWasmStore(prefixStore)
 	env := types.NewEnv(*a.ctx, contractAddr)
@@ -82,5 +81,3 @@ func (k Keeper) cosmwasmAPI(ctx sdk.Context) wasmvm.GoAPI {
 		GetContractEnv:   x.getContractEnv,
 	}
 }
-
-

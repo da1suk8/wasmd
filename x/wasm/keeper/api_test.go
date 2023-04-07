@@ -41,7 +41,7 @@ func TestAPIHumanAddress(t *testing.T) {
 
 func TestAPICanonicalAddress(t *testing.T) {
 	ctx, keepers := CreateTestInput(t, false, AvailableCapabilities)
-	api:= keepers.WasmKeeper.cosmwasmAPI(ctx)
+	api := keepers.WasmKeeper.cosmwasmAPI(ctx)
 
 	t.Run("valid address", func(t *testing.T) {
 		addr := "link1twsfmuj28ndph54k4nw8crwu8h9c8mh3rtx705"
