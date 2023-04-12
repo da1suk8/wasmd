@@ -5,6 +5,8 @@
 ### Features
 
 ### Improvements
+* [\#1](https://github.com/line/wasmd/pull/1) apply all changes of `x/wasm` in lbm-sdk until [lbm-sdk@3bdcb6ffe01c81615bedb777ca0e039cc46ef00c](https://github.com/line/lbm-sdk/tree/3bdcb6ffe01c81615bedb777ca0e039cc46ef00c)
+* [\#18](https://github.com/line/wasmd/pull/18) apply the wasm module of lbm-sdk(dynamic_link branch) until [lbm-sdk@911e8b47774f142d70d5c696722b0291e39e0c0c](https://github.com/line/lbm-sdk/tree/911e8b47774f142d70d5c696722b0291e39e0c0c)
 
 ### Bug Fixes
 
@@ -28,6 +30,7 @@
 * [\#7](https://github.com/line/wasmd/pull/7) separate custom features in `x/wasm` into `x/wasmplus` module
 * [\#8](https://github.com/line/wasmd/pull/8) Bump line/lbm-sdk to a7557b1d10
 * [\#10](https://github.com/line/wasmd/pull/10) update wasmvm version
+* [\#22](https://github.com/line/wasmd/pull/22) partial separation of dynamiclink into `wasmplus`
 
 ### Bug Fixes
 * [\#12](https://github.com/line/wasmd/pull/12) fix not to register wrong codec in `x/wasmplus`
