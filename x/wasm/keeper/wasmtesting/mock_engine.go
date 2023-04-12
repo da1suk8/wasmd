@@ -36,6 +36,7 @@ type MockWasmer struct {
 	PinFn               func(checksum wasmvm.Checksum) error
 	UnpinFn             func(checksum wasmvm.Checksum) error
 	GetMetricsFn        func() (*wasmvmtypes.Metrics, error)
+	// This section was added by dynamic link and differs from the original
 	GetCacheFn          func() *wasmvm.Cache
 }
 
@@ -173,6 +174,7 @@ func (m *MockWasmer) GetMetrics() (*wasmvmtypes.Metrics, error) {
 	return m.GetMetricsFn()
 }
 
+// This section was added by dynamic link and differs from the original
 func (m *MockWasmer) GetCache() *wasmvm.Cache {
 	if m.GetCacheFn == nil {
 		panic("not expected to be called")

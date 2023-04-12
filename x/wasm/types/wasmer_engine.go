@@ -239,5 +239,6 @@ type WasmerEngine interface {
 	// GetMetrics some internal metrics for monitoring purposes.
 	GetMetrics() (*wasmvmtypes.Metrics, error)
 
+	// This section was added by dynamic link and differs from the original
 	GetCache() *wasmvm.Cache
 }
