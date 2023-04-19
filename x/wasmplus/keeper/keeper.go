@@ -69,6 +69,7 @@ func NewKeeper(
 		homeDir,
 		wasmConfig,
 		availableCapabilities,
+		&result,
 		opts...,
 	)
 	return result

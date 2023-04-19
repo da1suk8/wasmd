@@ -22,7 +22,7 @@ func TestInstantiate2(t *testing.T) {
 	otherExample := StoreReflectContract(t, parentCtx, keepers)
 	mock := &wasmtesting.MockWasmer{}
 	wasmtesting.MakeInstantiable(mock)
-	keepers.WasmKeeper.wasmVM = mock // set mock to not fail on contract init message
+	keepers.WasmKeeper.WasmVM = mock // set mock to not fail on contract init message
 
 	verifierAddr := RandomAccountAddress(t)
 	beneficiaryAddr := RandomAccountAddress(t)

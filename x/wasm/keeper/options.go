@@ -21,7 +21,7 @@ func (f optsFn) apply(keeper *Keeper) {
 // given one.
 func WithWasmEngine(x types.WasmerEngine) Option {
 	return optsFn(func(k *Keeper) {
-		k.wasmVM = x
+		k.WasmVM = x
 	})
 }
 
@@ -45,7 +45,7 @@ func WithMessageHandlerDecorator(d func(old Messenger) Messenger) Option {
 // This option should not be combined with Option `WithQueryPlugins` or `WithQueryHandlerDecorator`
 func WithQueryHandler(x WasmVMQueryHandler) Option {
 	return optsFn(func(k *Keeper) {
-		k.wasmVMQueryHandler = x
+		k.WasmVMQueryHandler = x
 	})
 }
 
@@ -53,7 +53,7 @@ func WithQueryHandler(x WasmVMQueryHandler) Option {
 // This option should not be combined with Option `WithQueryPlugins` or `WithQueryHandler`
 func WithQueryHandlerDecorator(d func(old WasmVMQueryHandler) WasmVMQueryHandler) Option {
 	return optsFn(func(k *Keeper) {
-		k.wasmVMQueryHandler = d(k.wasmVMQueryHandler)
+		k.WasmVMQueryHandler = d(k.WasmVMQueryHandler)
 	})
 }
 
@@ -61,11 +61,11 @@ func WithQueryHandlerDecorator(d func(old WasmVMQueryHandler) WasmVMQueryHandler
 // This option expects the default `QueryHandler` set an should not be combined with Option `WithQueryHandler` or `WithQueryHandlerDecorator`.
 func WithQueryPlugins(x *QueryPlugins) Option {
 	return optsFn(func(k *Keeper) {
-		q, ok := k.wasmVMQueryHandler.(QueryPlugins)
+		q, ok := k.WasmVMQueryHandler.(QueryPlugins)
 		if !ok {
-			panic(fmt.Sprintf("Unsupported query handler type: %T", k.wasmVMQueryHandler))
+			panic(fmt.Sprintf("Unsupported query handler type: %T", k.WasmVMQueryHandler))
 		}
-		k.wasmVMQueryHandler = q.Merge(x)
+		k.WasmVMQueryHandler = q.Merge(x)
 	})
 }
 
@@ -113,7 +113,7 @@ func WithAccountPruner(x AccountPruner) Option {
 
 func WithVMCacheMetrics(r prometheus.Registerer) Option {
 	return optsFn(func(k *Keeper) {
-		NewWasmVMCacheMetricsCollector(k.wasmVM).Register(r)
+		NewWasmVMCacheMetricsCollector(k.WasmVM).Register(r)
 	})
 }
 
@@ -125,7 +125,7 @@ func WithGasRegister(x GasRegister) Option {
 		panic("must not be nil")
 	}
 	return optsFn(func(k *Keeper) {
-		k.gasRegister = x
+		k.GasRegister = x
 	})
 }
 

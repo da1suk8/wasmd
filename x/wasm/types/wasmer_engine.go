@@ -225,6 +225,27 @@ type WasmerEngine interface {
 		deserCost wasmvmtypes.UFraction,
 	) (*wasmvmtypes.IBCBasicResponse, uint64, error)
 
+	CallCallablePoint(
+		name []byte,
+		checksum wasmvm.Checksum,
+		isReadonly bool,
+		callstack []byte,
+		env wasmvmtypes.Env,
+		args []byte,
+		store wasmvm.KVStore,
+		goapi wasmvm.GoAPI,
+		querier wasmvm.Querier,
+		gasMeter wasmvm.GasMeter,
+		gasLimit uint64,
+		deserCost wasmvmtypes.UFraction,
+	) ([]byte, wasmvmtypes.Events, wasmvmtypes.EventAttributes, uint64, error)
+
+	ValidateDynamicLinkInterface(
+		checksum wasmvm.Checksum,
+		expectedInterface []byte,
+	) ([]byte, error)
+
+
 	// Pin pins a code to an in-memory cache, such that is
 	// always loaded quickly when executed.
 	// Pin is idempotent.

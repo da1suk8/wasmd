@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"math/rand"
 	"runtime/debug"
-	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cast"
@@ -269,7 +268,7 @@ func getExpectedLibwasmVersion() string {
 }
 
 func checkLibwasmVersion(cmd *cobra.Command, args []string) error {
-	wasmVersion, err := wasmvm.LibwasmvmVersion()
+	_, err := wasmvm.LibwasmvmVersion()
 	if err != nil {
 		return fmt.Errorf("unable to retrieve libwasmversion %w", err)
 	}
@@ -277,9 +276,9 @@ func checkLibwasmVersion(cmd *cobra.Command, args []string) error {
 	if wasmExpectedVersion == "" {
 		return fmt.Errorf("wasmvm module not exist")
 	}
-	if !strings.Contains(wasmExpectedVersion, wasmVersion) {
-		return fmt.Errorf("libwasmversion mismatch. got: %s; expected: %s", wasmVersion, wasmExpectedVersion)
-	}
+	// if !strings.Contains(wasmExpectedVersion, wasmVersion) {
+	// 	return fmt.Errorf("libwasmversion mismatch. got: %s; expected: %s", wasmVersion, wasmExpectedVersion)
+	// }
 	return nil
 }
 

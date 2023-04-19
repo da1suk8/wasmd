@@ -33,6 +33,8 @@ type MockWasmer struct {
 	IBCPacketReceiveFn  func(codeID wasmvm.Checksum, env wasmvmtypes.Env, msg wasmvmtypes.IBCPacketReceiveMsg, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.IBCReceiveResult, uint64, error)
 	IBCPacketAckFn      func(codeID wasmvm.Checksum, env wasmvmtypes.Env, msg wasmvmtypes.IBCPacketAckMsg, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.IBCBasicResponse, uint64, error)
 	IBCPacketTimeoutFn  func(codeID wasmvm.Checksum, env wasmvmtypes.Env, msg wasmvmtypes.IBCPacketTimeoutMsg, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) (*wasmvmtypes.IBCBasicResponse, uint64, error)
+	CallCallablePointFn            func(name []byte, checksum wasmvm.Checksum, kisReadonly bool, callstack []byte, env wasmvmtypes.Env, args []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) ([]byte, wasmvmtypes.Events, wasmvmtypes.EventAttributes, uint64, error)
+	ValidateDynamicLinkInterfaceFn func(checksum wasmvm.Checksum, expectedInterface []byte) ([]byte, error)
 	PinFn               func(checksum wasmvm.Checksum) error
 	UnpinFn             func(checksum wasmvm.Checksum) error
 	GetMetricsFn        func() (*wasmvmtypes.Metrics, error)
@@ -135,6 +137,20 @@ func (m *MockWasmer) Reply(codeID wasmvm.Checksum, env wasmvmtypes.Env, reply wa
 		panic("not supposed to be called!")
 	}
 	return m.ReplyFn(codeID, env, reply, store, goapi, querier, gasMeter, gasLimit, deserCost)
+}
+
+func (m *MockWasmer) CallCallablePoint(name []byte, checksum wasmvm.Checksum, isReadonly bool, callstack []byte, env wasmvmtypes.Env, args []byte, store wasmvm.KVStore, goapi wasmvm.GoAPI, querier wasmvm.Querier, gasMeter wasmvm.GasMeter, gasLimit uint64, deserCost wasmvmtypes.UFraction) ([]byte, wasmvmtypes.Events, wasmvmtypes.EventAttributes, uint64, error) {
+	if m.CallCallablePointFn == nil {
+		panic("not supposed to be called!")
+	}
+	return m.CallCallablePointFn(name, checksum, isReadonly, callstack, env, args, store, goapi, querier, gasMeter, gasLimit, deserCost)
+}
+
+func (m *MockWasmer) ValidateDynamicLinkInterface(checksum wasmvm.Checksum, expectedInterface []byte) ([]byte, error) {
+	if m.ValidateDynamicLinkInterfaceFn == nil {
+		panic("not supposed to be called!")
+	}
+	return m.ValidateDynamicLinkInterfaceFn(checksum, expectedInterface)
 }
 
 func (m *MockWasmer) GetCode(codeID wasmvm.Checksum) (wasmvm.WasmCode, error) {

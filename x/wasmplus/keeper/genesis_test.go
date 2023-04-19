@@ -36,7 +36,7 @@ import (
 
 const (
 	firstCodeID  = 1
-	humanAddress = "link1hcttwju93d5m39467gjcq63p5kc4fdcn30dgd8"
+	humanaddress = "link1hcttwju93d5m39467gjcq63p5kc4fdcn30dgd8"
 
 	AvailableCapabilities = "iterator,staking,stargate,cosmwasm_1_1"
 )
@@ -456,7 +456,7 @@ func TestGenesisInit(t *testing.T) {
 					{IDKey: wasmTypes.KeyLastInstanceID, Value: 1},
 				},
 				Params:                    wasmTypes.DefaultParams(),
-				InactiveContractAddresses: []string{humanAddress},
+				InactiveContractAddresses: []string{humanaddress},
 			},
 		},
 		"invalid path: inactiveContract - do not imported": {

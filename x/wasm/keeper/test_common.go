@@ -392,6 +392,7 @@ func createTestInput(
 		tempDir,
 		wasmConfig,
 		availableCapabilities,
+		nil,
 		opts...,
 	)
 	keeper.SetParams(ctx, types.DefaultParams())
@@ -609,7 +610,7 @@ func StoreRandomContractWithAccessConfig(
 	anyAmount := sdk.NewCoins(sdk.NewInt64Coin("denom", 1000))
 	creator, _, creatorAddr := keyPubAddr()
 	fundAccounts(t, ctx, keepers.AccountKeeper, keepers.BankKeeper, creatorAddr, anyAmount)
-	keepers.WasmKeeper.wasmVM = mock
+	keepers.WasmKeeper.WasmVM = mock
 	wasmCode := append(wasmIdent, rand.Bytes(10)...) //nolint:gocritic
 	codeID, checksum, err := keepers.ContractKeeper.Create(ctx, creatorAddr, wasmCode, cfg)
 	require.NoError(t, err)
