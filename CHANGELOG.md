@@ -7,6 +7,7 @@
 
 ### Improvements
 * [\#63](https://github.com/Finschia/wasmd/pull/63) add event checking to TestStoreCode
+* [\#65](https://github.com/Finschia/wasmd/pull/65) add test cases for empty request in each function
 
 ### Bug Fixes
 * [\#52](https://github.com/Finschia/wasmd/pull/52) fix cli_test error of wasmplus and add cli_test ci
