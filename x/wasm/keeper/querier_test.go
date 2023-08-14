@@ -67,6 +67,16 @@ func TestQueryAllContractState(t *testing.T) {
 				{Key: []byte{0x0, 0x1}, Value: []byte(`{"count":8}`)},
 			},
 		},
+		"with invalid pagination key": {
+			srcQuery: &types.QueryAllContractStateRequest{
+				Address: contractAddr.String(),
+				Pagination: &query.PageRequest{
+					Offset: 1,
+					Key:    []byte("test"),
+				},
+			},
+			expErr: fmt.Errorf("invalid request, either offset or key is expected, got both"),
+		},
 		"with pagination limit": {
 			srcQuery: &types.QueryAllContractStateRequest{
 				Address: contractAddr.String(),
@@ -104,7 +114,7 @@ func TestQueryAllContractState(t *testing.T) {
 		t.Run(msg, func(t *testing.T) {
 			got, err := q.AllContractState(sdk.WrapSDKContext(ctx), spec.srcQuery)
 			if spec.expErr != nil {
-				require.True(t, errors.Is(err, spec.expErr), "but got %+v", err)
+				require.Equal(t, spec.expErr, err, "but got %+v", err)
 				return
 			}
 			for _, exp := range spec.expModelContains {
@@ -409,6 +419,23 @@ func TestQueryContractHistory(t *testing.T) {
 				Msg:       []byte(`"migrate message 1"`),
 			}},
 		},
+		"with invalid pagination key": {
+			srcHistory: []types.ContractCodeHistoryEntry{{
+				Operation: types.ContractCodeHistoryOperationTypeGenesis,
+				CodeID:    firstCodeID,
+				Updated:   types.NewAbsoluteTxPosition(ctx),
+				Msg:       []byte(`"init message"`),
+			}},
+			req: &types.QueryContractHistoryRequest{
+				Address: myContractBech32Addr,
+				Pagination: &query.PageRequest{
+					Offset: 1,
+					Key:    []byte("test"),
+				},
+			},
+			expErr: fmt.Errorf("invalid request, either offset or key is expected, got both"),
+		},
+
 		"with pagination limit": {
 			srcHistory: []types.ContractCodeHistoryEntry{{
 				Operation: types.ContractCodeHistoryOperationTypeInit,
@@ -462,7 +489,7 @@ func TestQueryContractHistory(t *testing.T) {
 			// then
 			if spec.expErr != nil {
 				if err != nil {
-					assert.Equal(t, spec.expErr, err)
+					require.Equal(t, spec.expErr, err, "but got %+v", err)
 				} else {
 					require.Error(t, spec.expErr)
 				}
@@ -562,6 +589,16 @@ func TestQueryCodeList(t *testing.T) {
 			},
 			expCodeIDs: []uint64{2, 3},
 		},
+		"with invalid pagination key": {
+			storedCodeIDs: []uint64{1, 2, 3},
+			req: &types.QueryCodesRequest{
+				Pagination: &query.PageRequest{
+					Offset: 1,
+					Key:    []byte("test"),
+				},
+			},
+			expErr: fmt.Errorf("invalid request, either offset or key is expected, got both"),
+		},
 		"with pagination limit": {
 			storedCodeIDs: []uint64{1, 2, 3},
 			req: &types.QueryCodesRequest{
@@ -601,7 +638,7 @@ func TestQueryCodeList(t *testing.T) {
 			got, err := q.Codes(sdk.WrapSDKContext(xCtx), spec.req)
 			// then
 			if spec.expErr != nil {
-				require.True(t, errors.Is(err, spec.expErr), "but got %+v", err)
+				require.Equal(t, spec.expErr, err, "but got %+v", err)
 				return
 			}
 			require.NoError(t, err)
