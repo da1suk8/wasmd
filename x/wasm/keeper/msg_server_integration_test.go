@@ -63,7 +63,7 @@ func TestStoreCode(t *testing.T) {
 	assert.Equal(t, types.DefaultParams().InstantiateDefaultPermission.With(sender), info.InstantiateConfig)
 }
 
-func TestInstantiateContract(t *testing.T) {
+func TestInstantiateContract2(t *testing.T) {
 	wasmApp := app.Setup(false)
 	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
 
@@ -74,16 +74,19 @@ func TestInstantiateContract(t *testing.T) {
 	specs := map[string]struct {
 		addr       string
 		permission *types.AccessConfig
+		salt       string
 		expErr     bool
 	}{
 		"address can instantiate a contract when permission is everybody": {
 			addr:       myAddress.String(),
 			permission: &types.AllowEverybody,
+			salt:       "salt1",
 			expErr:     false,
 		},
 		"address cannot instantiate a contract when permission is nobody": {
 			addr:       myAddress.String(),
 			permission: &types.AllowNobody,
+			salt:       "salt2",
 			expErr:     true,
 		},
 	}
@@ -106,13 +109,15 @@ func TestInstantiateContract(t *testing.T) {
 			require.NoError(t, wasmApp.AppCodec().Unmarshal(rsp.Data, &result))
 
 			// when
-			msgInstantiate := &types.MsgInstantiateContract{
+			msgInstantiate := &types.MsgInstantiateContract2{
 				Sender: spec.addr,
 				Admin:  myAddress.String(),
 				CodeID: result.CodeID,
 				Label:  "test",
 				Msg:    []byte(`{}`),
 				Funds:  sdk.Coins{},
+				Salt:   []byte(spec.salt),
+				FixMsg: true,
 			}
 			rsp, err = wasmApp.MsgServiceRouter().Handler(msgInstantiate)(ctx, msgInstantiate)
 
