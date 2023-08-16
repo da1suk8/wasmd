@@ -92,7 +92,7 @@ func TestInstantiateContract2(t *testing.T) {
 	}
 	for name, spec := range specs {
 		t.Run(name, func(t *testing.T) {
-			// xCtx, _ := ctx.CacheContext()
+			xCtx, _ := ctx.CacheContext()
 
 			// setup
 			_, _, sender := testdata.KeyTestPubAddr()
@@ -103,7 +103,7 @@ func TestInstantiateContract2(t *testing.T) {
 			})
 
 			// store code
-			rsp, err := wasmApp.MsgServiceRouter().Handler(msg)(ctx, msg)
+			rsp, err := wasmApp.MsgServiceRouter().Handler(msg)(xCtx, msg)
 			require.NoError(t, err)
 			var result types.MsgStoreCodeResponse
 			require.NoError(t, wasmApp.AppCodec().Unmarshal(rsp.Data, &result))
@@ -119,7 +119,7 @@ func TestInstantiateContract2(t *testing.T) {
 				Salt:   []byte(spec.salt),
 				FixMsg: true,
 			}
-			rsp, err = wasmApp.MsgServiceRouter().Handler(msgInstantiate)(ctx, msgInstantiate)
+			rsp, err = wasmApp.MsgServiceRouter().Handler(msgInstantiate)(xCtx, msgInstantiate)
 
 			//then
 			if spec.expErr {
