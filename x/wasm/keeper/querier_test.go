@@ -862,26 +862,39 @@ func TestQueryParams(t *testing.T) {
 
 	q := Querier(keeper)
 
-	paramsResponse, err := q.Params(sdk.WrapSDKContext(ctx), &types.QueryParamsRequest{})
-	require.NoError(t, err)
-	require.NotNil(t, paramsResponse)
+	specs := map[string]struct {
+		setParams types.Params
+		expParams types.Params
+		expErr    error
+	}{
+		"allowEverybody(DefaultParams)": {
+			setParams: types.DefaultParams(),
+			expParams: types.DefaultParams(),
+		},
+		"allowNobody": {
+			setParams: types.Params{
+				CodeUploadAccess:             types.AllowNobody,
+				InstantiateDefaultPermission: types.AccessTypeNobody,
+			},
+			expParams: types.Params{
+				CodeUploadAccess:             types.AllowNobody,
+				InstantiateDefaultPermission: types.AccessTypeNobody,
+			},
+		},
+	}
+	for msg, spec := range specs {
+		t.Run(msg, func(t *testing.T) {
+			xCtx, _ := ctx.CacheContext()
+			keeper.SetParams(xCtx, spec.setParams)
 
-	defaultParams := types.DefaultParams()
+			paramsResponse, err := q.Params(sdk.WrapSDKContext(xCtx), &types.QueryParamsRequest{})
 
-	require.Equal(t, paramsResponse.Params.CodeUploadAccess, defaultParams.CodeUploadAccess)
-	require.Equal(t, paramsResponse.Params.InstantiateDefaultPermission, defaultParams.InstantiateDefaultPermission)
-
-	keeper.SetParams(ctx, types.Params{
-		CodeUploadAccess:             types.AllowNobody,
-		InstantiateDefaultPermission: types.AccessTypeNobody,
-	})
-
-	paramsResponse, err = q.Params(sdk.WrapSDKContext(ctx), &types.QueryParamsRequest{})
-	require.NoError(t, err)
-	require.NotNil(t, paramsResponse)
-
-	require.Equal(t, paramsResponse.Params.CodeUploadAccess, types.AllowNobody)
-	require.Equal(t, paramsResponse.Params.InstantiateDefaultPermission, types.AccessTypeNobody)
+			require.NoError(t, err)
+			require.NotNil(t, paramsResponse)
+			require.Equal(t, spec.expParams.CodeUploadAccess, paramsResponse.Params.CodeUploadAccess)
+			require.Equal(t, spec.expParams.InstantiateDefaultPermission, paramsResponse.Params.InstantiateDefaultPermission)
+		})
+	}
 }
 
 func TestQueryCodeInfo(t *testing.T) {
