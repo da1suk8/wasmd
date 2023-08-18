@@ -17,6 +17,7 @@
 * [\#74](https://github.com/Finschia/wasmd/pull/74) add event checking to TestInstantiateContract2
 * [\#78](https://github.com/Finschia/wasmd/pull/78) add the check for TestMigrateContract
 * [\#69](https://github.com/Finschia/wasmd/pull/69) refactor: refactor test cases for Params
+* [\#71](https://github.com/Finschia/wasmd/pull/71) add test cases in ContractsByCode
 
 ### Bug Fixes
 * [\#62](https://github.com/Finschia/wasmd/pull/62) fill ContractHistory querier result's Updated field
