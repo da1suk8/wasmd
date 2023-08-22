@@ -23,6 +23,7 @@
 * [\#62](https://github.com/Finschia/wasmd/pull/62) fill ContractHistory querier result's Updated field
 * [\#52](https://github.com/Finschia/wasmd/pull/52) fix cli_test error of wasmplus and add cli_test ci
 * [\#89](https://github.com/Finschia/wasmd/pull/89) fill ContractInfo querier result's Updated field
+* [\#90](https://github.com/Finschia/wasmd/pull/90) delete output in TestQueryContractsByCode
 
 ### Breaking Changes
 
