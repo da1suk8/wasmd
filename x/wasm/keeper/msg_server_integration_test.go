@@ -440,6 +440,107 @@ func TestExecuteContract(t *testing.T) {
 	}
 }
 
+func TestUpdateAdmin(t *testing.T) {
+	wasmApp := app.Setup(false)
+	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+
+	var (
+		myAddress       sdk.AccAddress = make([]byte, types.ContractAddrLen)
+		_, _, otherAddr                = testdata.KeyTestPubAddr()
+		_, _, newAdmin                 = testdata.KeyTestPubAddr()
+	)
+
+	// setup
+	storeMsg := types.MsgStoreCodeFixture(func(m *types.MsgStoreCode) {
+		m.WASMByteCode = wasmContract
+		m.Sender = myAddress.String()
+	})
+	rsp, err := wasmApp.MsgServiceRouter().Handler(storeMsg)(ctx, storeMsg)
+	require.NoError(t, err)
+	var storeCodeResult types.MsgStoreCodeResponse
+	require.NoError(t, wasmApp.AppCodec().Unmarshal(rsp.Data, &storeCodeResult))
+	codeID := storeCodeResult.CodeID
+
+	initMsg := types.MsgInstantiateContractFixture(func(m *types.MsgInstantiateContract) {
+		m.Sender = myAddress.String()
+		m.Admin = myAddress.String()
+		m.CodeID = codeID
+		m.Msg = []byte(`{}`)
+		m.Funds = sdk.Coins{}
+	})
+	rsp, err = wasmApp.MsgServiceRouter().Handler(initMsg)(ctx, initMsg)
+	require.NoError(t, err)
+
+	var instantiateContractResult types.MsgInstantiateContractResponse
+	require.NoError(t, wasmApp.AppCodec().Unmarshal(rsp.Data, &instantiateContractResult))
+	contractAddress := instantiateContractResult.Address
+
+	specs := map[string]struct {
+		addr      string
+		expErr    bool
+		expEvents []abci.Event
+	}{
+		"admin can update admin": {
+			addr:   myAddress.String(),
+			expErr: false,
+			expEvents: []abci.Event{
+				{
+					Type: "message",
+					Attributes: []abci.EventAttribute{
+						{
+							Key:   []byte("module"),
+							Value: []byte("wasm"),
+						},
+						{
+							Key:   []byte("sender"),
+							Value: []byte(myAddress.String()),
+						},
+					},
+				},
+				{
+					Type: "update_contract_admin",
+					Attributes: []abci.EventAttribute{
+						{
+							Key:   []byte("_contract_address"),
+							Value: []byte(contractAddress),
+						},
+						{
+							Key:   []byte("new_admin_address"),
+							Value: []byte(newAdmin.String()),
+						},
+					},
+				},
+			},
+		},
+		"other address cannot update admin": {
+			addr:   otherAddr.String(),
+			expErr: true,
+		},
+	}
+	for name, spec := range specs {
+		t.Run(name, func(t *testing.T) {
+			xCtx, _ := ctx.CacheContext()
+
+			// when
+			msgUpdateAdmin := &types.MsgUpdateAdmin{
+				Sender:   spec.addr,
+				NewAdmin: newAdmin.String(),
+				Contract: contractAddress,
+			}
+			rsp, err = wasmApp.MsgServiceRouter().Handler(msgUpdateAdmin)(xCtx, msgUpdateAdmin)
+
+			// then
+			if spec.expErr {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.Equal(t, spec.expEvents, rsp.Events)
+		})
+	}
+}
+
 func TestClearAdmin(t *testing.T) {
 	wasmApp := app.Setup(false)
 	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
