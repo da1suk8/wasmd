@@ -4,6 +4,7 @@
 
 ### Features
 * [\#61](https://github.com/Finschia/wasmd/pull/61) bumpup ibc-go to v4
+* [\#84](https://github.com/Finschia/wasmd/pull/84) add AcceptlistStaragteQuerier
 
 ### Improvements
 * [\#63](https://github.com/Finschia/wasmd/pull/63) add event checking to TestStoreCode
