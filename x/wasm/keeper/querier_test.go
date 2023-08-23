@@ -868,6 +868,9 @@ func TestQueryContractInfo(t *testing.T) {
 		myExt.TotalDeposit = nil
 		info.SetExtension(&myExt)
 	}
+	withIBCPort := func(info *types.ContractInfo) {
+		info.IBCPortID = "fooPort"
+	}
 	specs := map[string]struct {
 		src    *types.QueryContractInfoRequest
 		stored types.ContractInfo
@@ -888,6 +891,14 @@ func TestQueryContractInfo(t *testing.T) {
 			expRsp: &types.QueryContractInfoResponse{
 				Address:      contractAddr.String(),
 				ContractInfo: types.ContractInfoFixture(myExtension),
+			},
+		},
+		"with IBCPortID": {
+			src:    &types.QueryContractInfoRequest{Address: contractAddr.String()},
+			stored: types.ContractInfoFixture(withIBCPort),
+			expRsp: &types.QueryContractInfoResponse{
+				Address:      contractAddr.String(),
+				ContractInfo: types.ContractInfoFixture(withIBCPort),
 			},
 		},
 		"not found": {
