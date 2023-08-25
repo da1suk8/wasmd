@@ -26,6 +26,7 @@
 * [\#76](https://github.com/Finschia/wasmd/pull/76) add an integration test for ClearAdmin
 * [\#68](https://github.com/Finschia/wasmd/pull/68) add an integration test for UpdateAdmin
 * [\#99](https://github.com/Finschia/wasmd/pull/99) format test files
+* [\#98](https://github.com/Finschia/wasmd/pull/98) refactor TestStoreAndInstantiateContract
 
 ### Bug Fixes
 * [\#62](https://github.com/Finschia/wasmd/pull/62) fill ContractHistory querier result's Updated field
