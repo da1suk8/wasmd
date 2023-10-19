@@ -1,6 +1,21 @@
 # Changelog
 
-## [Unreleased](https://github.com/Finschia/wasmd/compare/v0.1.4...HEAD)
+## [Unreleased](https://github.com/Finschia/wasmd/compare/v0.2.0...HEAD)
+
+### Features
+
+### Improvements
+
+### Bug Fixes
+
+### Breaking Changes
+
+### Build, CI
+
+### Document Updates
+
+
+## [v0.2.0](https://github.com/Finschia/wasmd/releases/tag/v0.2.0) - 2023.10.19
 
 ### Features
 * [\#61](https://github.com/Finschia/wasmd/pull/61) bumpup ibc-go to v4
@@ -37,13 +52,11 @@
 * [\#95](https://github.com/Finschia/wasmd/pull/95) add a test case to verify ContractInfo gets correct IBCPortID
 * [\#101](https://github.com/Finschia/wasmd/pull/101) move helper method out of generated file
 
-### Breaking Changes
-
 ### Build, CI
 * [\#104](https://github.com/Finschia/wasmd/pull/104) change depending wasmvm to v1.1.1-0.11.4-rc1
 * [\#60](https://github.com/Finschia/wasmd/pull/60) Update golang version to 1.20
 * [\#105](https://github.com/Finschia/wasmd/pull/105) change depending finschia-sdk to v0.48.0-rc2 and backport #81
-* [\#108](https://github.com/Finschia/wasmd/pull/108) version bump of ostracon, finschia-sdk and wasmvm
+* [\#109](https://github.com/Finschia/wasmd/pull/109) version bump of ostracon, finschia-sdk and wasmvm
 
 ### Document Updates
 * [\#54](https://github.com/Finschia/wasmd/pull/54) add documentation about errors (codespace and codes)
