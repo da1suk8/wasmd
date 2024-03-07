@@ -1,13 +1,18 @@
 package types
 
 import (
-	"bytes"
-	"crypto/sha256"
-	"encoding/json"
+	_ "embed"
 	"math/rand"
 
-	sdk "github.com/Finschia/finschia-sdk/types"
+	wasmvm "github.com/Finschia/wasmvm"
+
+	sdkmath "cosmossdk.io/math"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
+
+//go:embed testdata/reflect.wasm
+var reflectWasmCode []byte
 
 func GenesisFixture(mutators ...func(*GenesisState)) GenesisState {
 	const (
@@ -35,11 +40,7 @@ func GenesisFixture(mutators ...func(*GenesisState)) GenesisState {
 			Value: uint64(i),
 		}
 	}
-	fixture.GenMsgs = []GenesisState_GenMsgs{
-		{Sum: &GenesisState_GenMsgs_StoreCode{StoreCode: MsgStoreCodeFixture()}},
-		{Sum: &GenesisState_GenMsgs_InstantiateContract{InstantiateContract: MsgInstantiateContractFixture()}},
-		{Sum: &GenesisState_GenMsgs_ExecuteContract{ExecuteContract: MsgExecuteContractFixture()}},
-	}
+
 	for _, m := range mutators {
 		m(&fixture)
 	}
@@ -53,12 +54,10 @@ func randBytes(n int) []byte {
 }
 
 func CodeFixture(mutators ...func(*Code)) Code {
-	wasmCode := randBytes(100)
-
 	fixture := Code{
 		CodeID:    1,
-		CodeInfo:  CodeInfoFixture(WithSHA256CodeHash(wasmCode)),
-		CodeBytes: wasmCode,
+		CodeInfo:  CodeInfoFixture(WithSHA256CodeHash(reflectWasmCode)),
+		CodeBytes: reflectWasmCode,
 	}
 
 	for _, m := range mutators {
@@ -68,8 +67,10 @@ func CodeFixture(mutators ...func(*Code)) Code {
 }
 
 func CodeInfoFixture(mutators ...func(*CodeInfo)) CodeInfo {
-	wasmCode := bytes.Repeat([]byte{0x1}, 10)
-	codeHash := sha256.Sum256(wasmCode)
+	codeHash, err := wasmvm.CreateChecksum(reflectWasmCode)
+	if err != nil {
+		panic(err)
+	}
 	const anyAddress = "link1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsh9tp23"
 	fixture := CodeInfo{
 		CodeHash:          codeHash[:],
@@ -87,9 +88,12 @@ func ContractFixture(mutators ...func(*Contract)) Contract {
 
 	fixture := Contract{
 		ContractAddress: anyAddress,
-		ContractInfo:    ContractInfoFixture(OnlyGenesisFields),
+		ContractInfo:    ContractInfoFixture(RandCreatedFields),
 		ContractState:   []Model{{Key: []byte("anyKey"), Value: []byte("anyValue")}},
 	}
+	fixture.ContractCodeHistory = []ContractCodeHistoryEntry{ContractCodeHistoryEntryFixture(func(e *ContractCodeHistoryEntry) {
+		e.Updated = fixture.ContractInfo.Created
+	})}
 
 	for _, m := range mutators {
 		m(&fixture)
@@ -99,6 +103,10 @@ func ContractFixture(mutators ...func(*Contract)) Contract {
 
 func OnlyGenesisFields(info *ContractInfo) {
 	info.Created = nil
+}
+
+func RandCreatedFields(info *ContractInfo) {
+	info.Created = &AbsoluteTxPosition{BlockHeight: rand.Uint64(), TxIndex: rand.Uint64()}
 }
 
 func ContractInfoFixture(mutators ...func(*ContractInfo)) ContractInfo {
@@ -117,9 +125,26 @@ func ContractInfoFixture(mutators ...func(*ContractInfo)) ContractInfo {
 	return fixture
 }
 
+// ContractCodeHistoryEntryFixture test fixture
+func ContractCodeHistoryEntryFixture(mutators ...func(*ContractCodeHistoryEntry)) ContractCodeHistoryEntry {
+	fixture := ContractCodeHistoryEntry{
+		Operation: ContractCodeHistoryOperationTypeInit,
+		CodeID:    1,
+		Updated:   ContractInfoFixture().Created,
+		Msg:       []byte(`{"foo":"bar"}`),
+	}
+	for _, m := range mutators {
+		m(&fixture)
+	}
+	return fixture
+}
+
 func WithSHA256CodeHash(wasmCode []byte) func(info *CodeInfo) {
 	return func(info *CodeInfo) {
-		codeHash := sha256.Sum256(wasmCode)
+		codeHash, err := wasmvm.CreateChecksum(wasmCode)
+		if err != nil {
+			panic(err)
+		}
 		info.CodeHash = codeHash[:]
 	}
 }
@@ -148,7 +173,7 @@ func MsgInstantiateContractFixture(mutators ...func(*MsgInstantiateContract)) *M
 		Msg:    []byte(`{"foo":"bar"}`),
 		Funds: sdk.Coins{{
 			Denom:  "stake",
-			Amount: sdk.NewInt(1),
+			Amount: sdkmath.NewInt(1),
 		}},
 	}
 	for _, m := range mutators {
@@ -168,7 +193,7 @@ func MsgExecuteContractFixture(mutators ...func(*MsgExecuteContract)) *MsgExecut
 		Msg:      []byte(`{"do":"something"}`),
 		Funds: sdk.Coins{{
 			Denom:  "stake",
-			Amount: sdk.NewInt(1),
+			Amount: sdkmath.NewInt(1),
 		}},
 	}
 	for _, m := range mutators {
