@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/Finschia/finschia-sdk/server"
-	svrcmd "github.com/Finschia/finschia-sdk/server/cmd"
+	"github.com/cosmos/cosmos-sdk/server"
+	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
 	app "github.com/Finschia/wasmd/appplus"
 )

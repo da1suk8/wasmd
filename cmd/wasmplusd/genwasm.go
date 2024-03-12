@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/Finschia/finschia-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client"
 
 	wasmcli "github.com/Finschia/wasmd/x/wasm/client/cli"
 )
