@@ -5,11 +5,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Finschia/finschia-sdk/client/flags"
-	clitestutil "github.com/Finschia/finschia-sdk/testutil/cli"
-	"github.com/Finschia/finschia-sdk/testutil/network"
-	sdk "github.com/Finschia/finschia-sdk/types"
 	ostcli "github.com/Finschia/ostracon/libs/cli"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
+	"github.com/cosmos/cosmos-sdk/testutil/network"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/Finschia/wasmd/x/wasm/client/cli"

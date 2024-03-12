@@ -13,11 +13,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/Finschia/finschia-sdk/client"
-	"github.com/Finschia/finschia-sdk/codec"
-	sdkerrors "github.com/Finschia/finschia-sdk/types/errors"
 	ocrpcmocks "github.com/Finschia/ostracon/rpc/client/mocks"
 	ocrpctypes "github.com/Finschia/ostracon/rpc/core/types"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/Finschia/wasmd/x/wasmplus/types"
 )

@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	sdk "github.com/Finschia/finschia-sdk/types"
-	sdkerrors "github.com/Finschia/finschia-sdk/types/errors"
-	govtypes "github.com/Finschia/finschia-sdk/x/gov/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	wasmkeeper "github.com/Finschia/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/Finschia/wasmd/x/wasm/types"

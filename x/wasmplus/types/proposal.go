@@ -3,9 +3,11 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/Finschia/finschia-sdk/types"
-	sdkerrors "github.com/Finschia/finschia-sdk/types/errors"
-	govtypes "github.com/Finschia/finschia-sdk/x/gov/types"
+	errorsmod "cosmossdk.io/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	wasmtypes "github.com/Finschia/wasmd/x/wasm/types"
 )
@@ -37,7 +39,7 @@ func (p DeactivateContractProposal) ProposalType() string {
 
 func (p DeactivateContractProposal) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(p.Contract); err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "contract")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "contract")
 	}
 
 	return nil
@@ -63,7 +65,7 @@ func (p ActivateContractProposal) ProposalType() string {
 
 func (p ActivateContractProposal) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(p.Contract); err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "contract")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "contract")
 	}
 
 	return nil

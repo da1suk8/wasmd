@@ -1,10 +1,11 @@
 package keeper
 
 import (
-	abci "github.com/tendermint/tendermint/abci/types"
+	abci "github.com/cometbft/cometbft/abci/types"
 
-	sdk "github.com/Finschia/finschia-sdk/types"
-	sdkerrors "github.com/Finschia/finschia-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	wasmkeeper "github.com/Finschia/wasmd/x/wasm/keeper"
 	"github.com/Finschia/wasmd/x/wasmplus/types"
@@ -19,7 +20,7 @@ func InitGenesis(
 ) ([]abci.ValidatorUpdate, error) {
 	result, err := wasmkeeper.InitGenesis(ctx, &keeper.Keeper, data.RawWasmState(), stakingKeeper, msgHandler)
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "wasm")
+		return nil, errorsmod.Wrap(err, "wasm")
 	}
 
 	// set InactiveContractAddresses
@@ -27,7 +28,7 @@ func InitGenesis(
 		inactiveContractAddr := sdk.MustAccAddressFromBech32(contractAddr)
 		err = keeper.deactivateContract(ctx, inactiveContractAddr)
 		if err != nil {
-			return nil, sdkerrors.Wrapf(err, "contract number %d", i)
+			return nil, errorsmod.Wrapf(err, "contract number %d", i)
 		}
 	}
 

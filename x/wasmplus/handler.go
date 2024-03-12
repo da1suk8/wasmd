@@ -3,7 +3,7 @@ package wasmplus
 import (
 	"github.com/gogo/protobuf/proto"
 
-	sdk "github.com/Finschia/finschia-sdk/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/Finschia/wasmd/x/wasm"
 	wasmtypes "github.com/Finschia/wasmd/x/wasm/types"

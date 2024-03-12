@@ -3,12 +3,12 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/Finschia/finschia-sdk/codec"
-	sdk "github.com/Finschia/finschia-sdk/types"
-	sdkerrors "github.com/Finschia/finschia-sdk/types/errors"
-	bankpluskeeper "github.com/Finschia/finschia-sdk/x/bankplus/keeper"
-	paramtypes "github.com/Finschia/finschia-sdk/x/params/types"
 	"github.com/Finschia/ostracon/libs/log"
+	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	bankpluskeeper "github.com/cosmos/cosmos-sdk/x/bankplus/keeper"
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
 	wasmkeeper "github.com/Finschia/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/Finschia/wasmd/x/wasm/types"

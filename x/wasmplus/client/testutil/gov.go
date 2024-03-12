@@ -3,11 +3,11 @@ package testutil
 import (
 	"fmt"
 
-	"github.com/Finschia/finschia-sdk/client/flags"
-	clitestutil "github.com/Finschia/finschia-sdk/testutil/cli"
-	sdk "github.com/Finschia/finschia-sdk/types"
-	govcli "github.com/Finschia/finschia-sdk/x/gov/client/cli"
-	"github.com/Finschia/finschia-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
+	"github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/Finschia/wasmd/x/wasmplus/client/cli"
 )
