@@ -10,8 +10,8 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	db "github.com/tendermint/tm-db"
 
-	"github.com/Finschia/finschia-sdk/server"
 	"github.com/Finschia/ostracon/libs/log"
+	"github.com/cosmos/cosmos-sdk/server"
 
 	wasmapp "github.com/Finschia/wasmd/app"
 	wasmkeeper "github.com/Finschia/wasmd/x/wasm/keeper"
