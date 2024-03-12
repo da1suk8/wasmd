@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -19,7 +20,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 
-	"github.com/Finschia/wasmd/x/wasm/client/cli/os"
 	"github.com/Finschia/wasmd/x/wasm/ioutils"
 	"github.com/Finschia/wasmd/x/wasm/types"
 )
