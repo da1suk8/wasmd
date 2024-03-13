@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 	dbm "github.com/tendermint/tm-db"
 
+	"cosmossdk.io/store"
 	tmcli "github.com/Finschia/ostracon/libs/cli"
 	"github.com/Finschia/ostracon/libs/log"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -24,7 +25,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/snapshots"
-	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
