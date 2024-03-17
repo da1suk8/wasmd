@@ -256,7 +256,7 @@ func CustomQuerierImpl(queryRouter GRPCQueryRouter) func(ctx sdk.Context, querie
 			Data: linkQueryWrapper.Data,
 			Path: linkQueryWrapper.Path,
 		}
-		res, err := route(ctx, req)
+		res, err := route(ctx, &req)
 		if err != nil {
 			return nil, err
 		}
