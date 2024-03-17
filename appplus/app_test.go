@@ -10,7 +10,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 	db "github.com/tendermint/tm-db"
 
-	"github.com/Finschia/ostracon/libs/log"
+	"cosmossdk.io/log"
 	"github.com/cosmos/cosmos-sdk/server"
 
 	wasmapp "github.com/Finschia/wasmd/app"
