@@ -7,13 +7,13 @@ import (
 	"testing"
 	"time"
 
+	abci "github.com/cometbft/cometbft/abci/types"
+	dbm "github.com/cosmos/cosmos-db"
 	fuzz "github.com/google/gofuzz"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/proto/tendermint/crypto"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	dbm "github.com/tendermint/tm-db"
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/store"

@@ -6,10 +6,10 @@ import (
 	"net/url"
 	"testing"
 
+	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 

@@ -5,10 +5,10 @@ import (
 	"os"
 	"testing"
 
+	abci "github.com/cometbft/cometbft/abci/types"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
-	db "github.com/tendermint/tm-db"
 
 	"cosmossdk.io/log"
 	"github.com/cosmos/cosmos-sdk/server"
@@ -22,7 +22,7 @@ import (
 var emptyWasmOpts []wasmkeeper.Option = nil
 
 func TestWasmdExport(t *testing.T) {
-	db := db.NewMemDB()
+	db := dbm.NewMemDB()
 	gapp := NewWasmApp(log.NewOCLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, MakeEncodingConfig(), wasmplustypes.EnableAllProposals, wasmapp.EmptyBaseAppOptions{}, emptyWasmOpts)
 	require.Equal(t, appName, gapp.Name())
 
@@ -47,7 +47,7 @@ func TestWasmdExport(t *testing.T) {
 
 // ensure that blocked addresses are properly set in bank keeper
 func TestBlockedAddrs(t *testing.T) {
-	db := db.NewMemDB()
+	db := dbm.NewMemDB()
 	gapp := NewWasmApp(log.NewOCLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, MakeEncodingConfig(), wasmplustypes.EnableAllProposals, wasmapp.EmptyBaseAppOptions{}, emptyWasmOpts)
 	blockedAddrs := gapp.BlockedAddrs()
 

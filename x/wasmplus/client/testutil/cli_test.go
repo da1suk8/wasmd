@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/stretchr/testify/suite"
-	dbm "github.com/tendermint/tm-db"
 
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cometbft/cometbft/libs/rand"

@@ -3,8 +3,8 @@ package appplus
 import (
 	"encoding/json"
 
-	abci "github.com/tendermint/tendermint/abci/types"
-	dbm "github.com/tendermint/tm-db"
+	abci "github.com/cometbft/cometbft/abci/types"
+	dbm "github.com/cosmos/cosmos-db"
 
 	"cosmossdk.io/log"
 
