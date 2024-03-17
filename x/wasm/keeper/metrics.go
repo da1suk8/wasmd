@@ -100,10 +100,10 @@ type metricSource interface {
 	GetMetrics() (*wasmvmtypes.Metrics, error)
 }
 
-var _ prometheus.Collector = (*WasmVMCacheMetricsCollector)(nil)
+var _ prometheus.Collector = (*WasmVMMetricsCollector)(nil)
 
-// WasmVMCacheMetricsCollector custom metrics collector to be used with Prometheus
-type WasmVMCacheMetricsCollector struct {
+// WasmVMMetricsCollector custom metrics collector to be used with Prometheus
+type WasmVMMetricsCollector struct {
 	source             metricSource
 	CacheHitsDescr     *prometheus.Desc
 	CacheMissesDescr   *prometheus.Desc
@@ -126,12 +126,12 @@ func NewWasmVMMetricsCollector(s metricSource) *WasmVMMetricsCollector {
 }
 
 // Register registers all metrics
-func (p *WasmVMCacheMetricsCollector) Register(r prometheus.Registerer) {
+func (p *WasmVMMetricsCollector) Register(r prometheus.Registerer) {
 	r.MustRegister(p)
 }
 
 // Describe sends the super-set of all possible descriptors of metrics
-func (p *WasmVMCacheMetricsCollector) Describe(descs chan<- *prometheus.Desc) {
+func (p *WasmVMMetricsCollector) Describe(descs chan<- *prometheus.Desc) {
 	descs <- p.CacheHitsDescr
 	descs <- p.CacheMissesDescr
 	descs <- p.CacheElementsDescr
@@ -139,7 +139,7 @@ func (p *WasmVMCacheMetricsCollector) Describe(descs chan<- *prometheus.Desc) {
 }
 
 // Collect is called by the Prometheus registry when collecting metrics.
-func (p *WasmVMCacheMetricsCollector) Collect(c chan<- prometheus.Metric) {
+func (p *WasmVMMetricsCollector) Collect(c chan<- prometheus.Metric) {
 	m, err := p.source.GetMetrics()
 	if err != nil {
 		return
