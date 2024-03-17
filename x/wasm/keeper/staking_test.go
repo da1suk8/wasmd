@@ -21,6 +21,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/Finschia/wasmd/x/wasm/keeper/testdata"
+	wasmtypes "github.com/Finschia/wasmd/x/wasm/types"
 )
 
 type StakingInitMsg struct {

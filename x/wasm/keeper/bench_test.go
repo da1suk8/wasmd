@@ -6,6 +6,7 @@ import (
 
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/stretchr/testify/require"
+	"github.com/syndtr/goleveldb/leveldb/opt"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 
