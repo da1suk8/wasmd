@@ -1062,7 +1062,7 @@ func TestUnmarshalContentFromJson(t *testing.T) {
 
 // Deprecated: all gov v1beta1 types are supported for gov store only
 func StoreCodeProposalFixture(mutators ...func(*StoreCodeProposal)) *StoreCodeProposal {
-	const anyAddress = "cosmos1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs2m6sx4"
+	const anyAddress = "link1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsh9tp23"
 	wasm := []byte{0x0}
 	// got the value from shell sha256sum
 	codeHash, err := hex.DecodeString("6E340B9CFFB37A989CA544E6BB780A2C78901D3FB33738768511A30617AFA01D")
@@ -1098,7 +1098,7 @@ func InstantiateContractProposalFixture(mutators ...func(p *InstantiateContractP
 			Beneficiary: anyValidAddress,
 		}
 	)
-	const anyAddress = "cosmos1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs2m6sx4"
+	const anyAddress = "link1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsh9tp23"
 
 	initMsgBz, err := json.Marshal(initMsg)
 	if err != nil {
@@ -1222,8 +1222,8 @@ func MigrateContractProposalFixture(mutators ...func(p *MigrateContractProposal)
 		panic(err)
 	}
 	const (
-		contractAddr = "cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr"
-		anyAddress   = "cosmos1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs2m6sx4"
+		contractAddr = "link1hcttwju93d5m39467gjcq63p5kc4fdcn30dgd8"
+		anyAddress   = "link1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsh9tp23"
 	)
 	p := &MigrateContractProposal{
 		Title:       "Foo",
@@ -1242,7 +1242,7 @@ func MigrateContractProposalFixture(mutators ...func(p *MigrateContractProposal)
 // Deprecated: all gov v1beta1 types are supported for gov store only
 func SudoContractProposalFixture(mutators ...func(p *SudoContractProposal)) *SudoContractProposal {
 	const (
-		contractAddr = "cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr"
+		contractAddr = "link1hcttwju93d5m39467gjcq63p5kc4fdcn30dgd8"
 	)
 
 	p := &SudoContractProposal{
@@ -1261,8 +1261,8 @@ func SudoContractProposalFixture(mutators ...func(p *SudoContractProposal)) *Sud
 // Deprecated: all gov v1beta1 types are supported for gov store only
 func ExecuteContractProposalFixture(mutators ...func(p *ExecuteContractProposal)) *ExecuteContractProposal {
 	const (
-		contractAddr = "cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr"
-		anyAddress   = "cosmos1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs2m6sx4"
+		contractAddr = "link1hcttwju93d5m39467gjcq63p5kc4fdcn30dgd8"
+		anyAddress   = "link1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsh9tp23"
 	)
 
 	p := &ExecuteContractProposal{
@@ -1286,8 +1286,8 @@ func ExecuteContractProposalFixture(mutators ...func(p *ExecuteContractProposal)
 // Deprecated: all gov v1beta1 types are supported for gov store only
 func UpdateAdminProposalFixture(mutators ...func(p *UpdateAdminProposal)) *UpdateAdminProposal {
 	const (
-		contractAddr = "cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr"
-		anyAddress   = "cosmos1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs2m6sx4"
+		contractAddr = "link1hcttwju93d5m39467gjcq63p5kc4fdcn30dgd8"
+		anyAddress   = "link1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqsh9tp23"
 	)
 
 	p := &UpdateAdminProposal{
@@ -1304,7 +1304,7 @@ func UpdateAdminProposalFixture(mutators ...func(p *UpdateAdminProposal)) *Updat
 
 // Deprecated: all gov v1beta1 types are supported for gov store only
 func ClearAdminProposalFixture(mutators ...func(p *ClearAdminProposal)) *ClearAdminProposal {
-	const contractAddr = "cosmos14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s4hmalr"
+	const contractAddr = "link1hcttwju93d5m39467gjcq63p5kc4fdcn30dgd8"
 	p := &ClearAdminProposal{
 		Title:       "Foo",
 		Description: "Bar",
