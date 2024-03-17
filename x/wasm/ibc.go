@@ -189,10 +189,6 @@ func (i IBCHandler) OnChanOpenConfirm(ctx sdk.Context, portID, channelID string)
 	if !ok {
 		return errorsmod.Wrapf(channeltypes.ErrInvalidChannelVersion, "port ID (%s) channel ID (%s)", portID, channelID)
 	}
-	appVersion, ok := i.appVersionGetter.GetAppVersion(ctx, portID, channelID)
-	if !ok {
-		return sdkerrors.Wrapf(channeltypes.ErrInvalidChannelVersion, "port ID (%s) channel ID (%s)", portID, channelID)
-	}
 	msg := wasmvmtypes.IBCChannelConnectMsg{
 		OpenConfirm: &wasmvmtypes.IBCOpenConfirm{
 			Channel: toWasmVMChannel(portID, channelID, channelInfo, appVersion),
@@ -214,10 +210,6 @@ func (i IBCHandler) OnChanCloseInit(ctx sdk.Context, portID, channelID string) e
 	appVersion, ok := i.appVersionGetter.GetAppVersion(ctx, portID, channelID)
 	if !ok {
 		return errorsmod.Wrapf(channeltypes.ErrInvalidChannelVersion, "port ID (%s) channel ID (%s)", portID, channelID)
-	}
-	appVersion, ok := i.appVersionGetter.GetAppVersion(ctx, portID, channelID)
-	if !ok {
-		return sdkerrors.Wrapf(channeltypes.ErrInvalidChannelVersion, "port ID (%s) channel ID (%s)", portID, channelID)
 	}
 
 	msg := wasmvmtypes.IBCChannelCloseMsg{
@@ -246,10 +238,6 @@ func (i IBCHandler) OnChanCloseConfirm(ctx sdk.Context, portID, channelID string
 	appVersion, ok := i.appVersionGetter.GetAppVersion(ctx, portID, channelID)
 	if !ok {
 		return errorsmod.Wrapf(channeltypes.ErrInvalidChannelVersion, "port ID (%s) channel ID (%s)", portID, channelID)
-	}
-	appVersion, ok := i.appVersionGetter.GetAppVersion(ctx, portID, channelID)
-	if !ok {
-		return sdkerrors.Wrapf(channeltypes.ErrInvalidChannelVersion, "port ID (%s) channel ID (%s)", portID, channelID)
 	}
 
 	msg := wasmvmtypes.IBCChannelCloseMsg{
