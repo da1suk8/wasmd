@@ -1,8 +1,9 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	wasmkeeper "github.com/Finschia/wasmd/x/wasm/keeper"
 	"github.com/Finschia/wasmd/x/wasmplus/types"
@@ -27,28 +28,28 @@ func NewPermissionedKeeper(k wasmkeeper.PermissionedKeeper, extended decoratedKe
 
 func (p PermissionedKeeper) Execute(ctx sdk.Context, contractAddress sdk.AccAddress, caller sdk.AccAddress, msg []byte, coins sdk.Coins) ([]byte, error) {
 	if p.extended.IsInactiveContract(ctx, contractAddress) {
-		return nil, sdkerrors.Wrap(types.ErrInactiveContract, "can not execute")
+		return nil, errorsmod.Wrap(types.ErrInactiveContract, "can not execute")
 	}
 	return p.PermissionedKeeper.Execute(ctx, contractAddress, caller, msg, coins)
 }
 
 func (p PermissionedKeeper) Migrate(ctx sdk.Context, contractAddress sdk.AccAddress, caller sdk.AccAddress, newCodeID uint64, msg []byte) ([]byte, error) {
 	if p.extended.IsInactiveContract(ctx, contractAddress) {
-		return nil, sdkerrors.Wrap(types.ErrInactiveContract, "can not execute")
+		return nil, errorsmod.Wrap(types.ErrInactiveContract, "can not execute")
 	}
 	return p.PermissionedKeeper.Migrate(ctx, contractAddress, caller, newCodeID, msg)
 }
 
 func (p PermissionedKeeper) UpdateContractAdmin(ctx sdk.Context, contractAddress sdk.AccAddress, caller sdk.AccAddress, newAdmin sdk.AccAddress) error {
 	if p.extended.IsInactiveContract(ctx, contractAddress) {
-		return sdkerrors.Wrap(types.ErrInactiveContract, "can not execute")
+		return errorsmod.Wrap(types.ErrInactiveContract, "can not execute")
 	}
 	return p.PermissionedKeeper.UpdateContractAdmin(ctx, contractAddress, caller, newAdmin)
 }
 
 func (p PermissionedKeeper) ClearContractAdmin(ctx sdk.Context, contractAddress sdk.AccAddress, caller sdk.AccAddress) error {
 	if p.extended.IsInactiveContract(ctx, contractAddress) {
-		return sdkerrors.Wrap(types.ErrInactiveContract, "can not execute")
+		return errorsmod.Wrap(types.ErrInactiveContract, "can not execute")
 	}
 	return p.PermissionedKeeper.ClearContractAdmin(ctx, contractAddress, caller)
 }
