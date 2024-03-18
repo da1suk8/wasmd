@@ -7,7 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
 	wasmtypes "github.com/Finschia/wasmd/x/wasm/types"
 )
@@ -23,8 +23,8 @@ var EnableAllProposals = append([]wasmtypes.ProposalType{
 }, wasmtypes.EnableAllProposals...)
 
 func init() {
-	govtypes.RegisterProposalType(string(ProposalTypeDeactivateContract))
-	govtypes.RegisterProposalType(string(ProposalTypeActivateContract))
+	v1beta1.RegisterProposalType(string(ProposalTypeDeactivateContract))
+	v1beta1.RegisterProposalType(string(ProposalTypeActivateContract))
 }
 
 func (p DeactivateContractProposal) GetTitle() string { return p.Title }
