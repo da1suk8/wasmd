@@ -46,7 +46,6 @@ func (gs GenesisState) RawWasmState() wasmtypes.GenesisState {
 		Codes:     gs.Codes,
 		Contracts: gs.Contracts,
 		Sequences: gs.Sequences,
-		GenMsgs:   gs.GenMsgs,
 	}
 }
 

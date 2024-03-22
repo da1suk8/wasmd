@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"context"
+
 	errorsmod "cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -13,8 +15,8 @@ var _ types.ContractOpsKeeper = PermissionedKeeper{}
 
 type decoratedKeeper interface {
 	types.ViewKeeper
-	activateContract(ctx sdk.Context, contractAddress sdk.AccAddress) error
-	deactivateContract(ctx sdk.Context, contractAddress sdk.AccAddress) error
+	activateContract(ctx context.Context, contractAddress sdk.AccAddress) error
+	deactivateContract(ctx context.Context, contractAddress sdk.AccAddress) error
 }
 
 type PermissionedKeeper struct {

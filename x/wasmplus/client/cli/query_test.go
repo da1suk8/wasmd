@@ -6,6 +6,11 @@ import (
 	"net/url"
 	"testing"
 
+	errorsmod "cosmossdk.io/errors"
+
+	cmtrpcmocks "github.com/cometbft/cometbft/rpc/client/mocks"
+	cmtrpctypes "github.com/cometbft/cometbft/rpc/core/types"
+
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -13,8 +18,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	cmtrpcmocks "github.com/cometbft/cometbft/rpc/client/mocks"
-	cmtrpctypes "github.com/cometbft/cometbft/rpc/core/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -48,7 +51,7 @@ func TestGetCmdListInactiveContracts(t *testing.T) {
 		},
 		{
 			"invalid request",
-			sdkerrors.Wrap(sdkerrors.ErrInvalidRequest,
+			errorsmod.Wrap(sdkerrors.ErrInvalidRequest,
 				"page and offset cannot be used together"),
 			ctx,
 			[]string{"--page=2", "--offset=1"},

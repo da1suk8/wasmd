@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"testing"
 
+	errorsmod "cosmossdk.io/errors"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -35,7 +37,7 @@ var (
 	argsWithAddr        = []string{accAddress}
 	badStatusError      = status.Error(codes.Unknown, "")
 	invalidRequestFlags = []string{"--page=2", "--offset=1"}
-	invalidRequestError = sdkerrors.Wrap(sdkerrors.ErrInvalidRequest,
+	invalidRequestError = errorsmod.Wrap(sdkerrors.ErrInvalidRequest,
 		"page and offset cannot be used together")
 	invalidNodeFlags   = []string{"--node=" + string(rune(0))}
 	invalidControlChar = &url.Error{
