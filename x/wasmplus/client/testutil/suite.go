@@ -5,6 +5,8 @@ import (
 	"os"
 	"testing"
 
+	sdkmath "cosmossdk.io/math"
+
 	ostcli "github.com/Finschia/ostracon/libs/cli"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
@@ -38,8 +40,8 @@ type IntegrationTestSuite struct {
 
 var commonArgs = []string{
 	fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
-	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
-	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100))).String()),
+	fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+	fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.NewInt(100))).String()),
 }
 
 func NewIntegrationTestSuite(cfg network.Config) *IntegrationTestSuite {
@@ -64,7 +66,10 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	genesisState[types.ModuleName] = wasmDataBz
 	s.cfg.GenesisState = genesisState
 
-	s.network = network.New(s.T(), s.cfg)
+	baseDir, err := os.MkdirTemp(s.T().TempDir(), s.cfg.ChainID)
+	s.Require().NoError(err)
+	s.network, err = network.New(s.T(), baseDir, s.cfg)
+	s.Require().NoError(err)
 	_, err = s.network.WaitForHeight(1)
 	s.Require().NoError(err)
 

@@ -99,7 +99,6 @@ func (s *IntegrationTestSuite) TestGetCmdQueryCodeInfo() {
 				DataHash: expectedDataHash,
 				InstantiatePermission: types.AccessConfig{
 					Permission: types.AccessTypeEverybody,
-					Address:    "",
 					Addresses:  []string{},
 				},
 			},

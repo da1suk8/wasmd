@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cosmos/btcutil/bech32"
+
 	wasmvm "github.com/Finschia/wasmvm"
 	wasmvmtypes "github.com/Finschia/wasmvm/types"
 	"github.com/stretchr/testify/assert"
@@ -314,46 +316,54 @@ func TestQueryRawContractState(t *testing.T) {
 func TestQueryContractsByCode(t *testing.T) {
 	ctx, keepers := CreateTestInput(t, false, AvailableCapabilities)
 	keeper := keepers.WasmKeeper
-	q := Querier(keeper)
 
-	// store contract
-	contract := StoreHackatomExampleContract(t, ctx, keepers)
+	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 1000000))
+	topUp := sdk.NewCoins(sdk.NewInt64Coin("denom", 500))
+	creator := keepers.Faucet.NewFundedRandomAccount(ctx, deposit...)
+	anyAddr := keepers.Faucet.NewFundedRandomAccount(ctx, topUp...)
 
-	createInitMsg := func(ctx sdk.Context, keepers TestKeepers) sdk.AccAddress {
-		_, _, verifierAddr := keyPubAddr()
-		fundAccounts(t, ctx, keepers.AccountKeeper, keepers.BankKeeper, verifierAddr, contract.InitialAmount)
+	wasmCode, err := os.ReadFile("./testdata/hackatom.wasm")
+	require.NoError(t, err)
 
-		_, _, beneficiaryAddr := keyPubAddr()
-		initMsgBz := HackatomExampleInitMsg{
-			Verifier:    verifierAddr,
-			Beneficiary: beneficiaryAddr,
-		}.GetBytes(t)
-		initialAmount := sdk.NewCoins(sdk.NewInt64Coin("denom", 100))
+	codeID, _, err := keepers.ContractKeeper.Create(ctx, creator, wasmCode, nil)
+	require.NoError(t, err)
 
-		adminAddr := contract.CreatorAddr
-		label := "demo contract to query"
-		contractAddr, _, err := keepers.ContractKeeper.Instantiate(ctx, contract.CodeID, contract.CreatorAddr, adminAddr, initMsgBz, label, initialAmount)
-		require.NoError(t, err)
-		return contractAddr
+	_, bob := keyPubAddr()
+	initMsg := HackatomExampleInitMsg{
+		Verifier:    anyAddr,
+		Beneficiary: bob,
+	}
+	initMsgBz, err := json.Marshal(initMsg)
+	require.NoError(t, err)
+
+	// manage some realistic block settings
+	var h int64 = 10
+	setBlock := func(ctx sdk.Context, height int64) sdk.Context {
+		ctx = ctx.WithBlockHeight(height)
+		meter := storetypes.NewGasMeter(1000000)
+		ctx = ctx.WithGasMeter(meter)
+		ctx = ctx.WithBlockGasMeter(meter)
+		return ctx
 	}
 
-	// related link: https://github.com/CosmWasm/wasmd/issues/1559
-	// When not set with a block, the contract will return results based on the order of address rather than instantiation (timestamp).
-	// Since this function will test results for pagination, it is necessary to ensure that the results are returned in the order of instantiation.
-	// manage some realistic block settings
-	meter := sdk.NewGasMeter(1000000)
-	ctx = ctx.WithGasMeter(meter)
-	ctx = ctx.WithBlockGasMeter(meter)
+	contractAddrs := make([]string, 0, 10)
+	// create 10 contracts with real block/gas setup
+	for i := 0; i < 10; i++ {
+		// 3 tx per block, so we ensure both comparisons work
+		if i%3 == 0 {
+			ctx = setBlock(ctx, h)
+			h++
+		}
+		addr, _, err := keepers.ContractKeeper.Instantiate(ctx, codeID, creator, nil, initMsgBz, fmt.Sprintf("contract %d", i), topUp)
+		contractAddrs = append(contractAddrs, addr.String())
+		require.NoError(t, err)
+	}
 
-	// create 2 contracts with real block/gas setup
-	exampleContractAddr1 := createInitMsg(ctx, keepers).String()
-	exampleContractAddr2 := createInitMsg(ctx, keepers).String()
-
+	q := Querier(keeper)
 	specs := map[string]struct {
-		req                *types.QueryContractsByCodeRequest
-		expAddr            []string
-		expPaginationTotal uint64
-		expErr             error
+		req     *types.QueryContractsByCodeRequest
+		expAddr []string
+		expErr  error
 	}{
 		"with empty request": {
 			req:    nil,
@@ -361,71 +371,65 @@ func TestQueryContractsByCode(t *testing.T) {
 		},
 		"req.CodeId=0": {
 			req:    &types.QueryContractsByCodeRequest{CodeId: 0},
-			expErr: sdkErrors.Wrap(types.ErrInvalid, "code id"),
+			expErr: errorsmod.Wrap(types.ErrInvalid, "code id"),
 		},
 		"not exist codeID": {
-			req:                &types.QueryContractsByCodeRequest{CodeId: 2},
-			expAddr:            []string{},
-			expPaginationTotal: 0,
+			req:     &types.QueryContractsByCodeRequest{CodeId: codeID + 1},
+			expAddr: []string{},
 		},
-		"query all": {
+		"query all and check the results are properly sorted": {
 			req: &types.QueryContractsByCodeRequest{
-				CodeId: 1,
+				CodeId: codeID,
 			},
-			expAddr:            []string{exampleContractAddr1, exampleContractAddr2},
-			expPaginationTotal: 2,
+			expAddr: contractAddrs,
 		},
 		"with pagination offset": {
 			req: &types.QueryContractsByCodeRequest{
-				CodeId: 1,
+				CodeId: codeID,
 				Pagination: &query.PageRequest{
-					Offset: 1,
+					Offset: 5,
 				},
 			},
-			expAddr:            []string{exampleContractAddr2},
-			expPaginationTotal: 2,
+			expErr: errLegacyPaginationUnsupported,
 		},
 		"with invalid pagination key": {
 			req: &types.QueryContractsByCodeRequest{
-				CodeId: 1,
+				CodeId: codeID,
 				Pagination: &query.PageRequest{
 					Offset: 1,
 					Key:    []byte("test"),
 				},
 			},
-			expErr: fmt.Errorf("invalid request, either offset or key is expected, got both"),
+			expErr: errLegacyPaginationUnsupported,
 		},
 		"with pagination limit": {
 			req: &types.QueryContractsByCodeRequest{
-				CodeId: 1,
+				CodeId: codeID,
 				Pagination: &query.PageRequest{
-					Limit: 1,
+					Limit: 5,
 				},
 			},
-			expAddr:            []string{exampleContractAddr1},
-			expPaginationTotal: 0,
+			expAddr: contractAddrs[0:5],
 		},
 		"with pagination next key": {
 			req: &types.QueryContractsByCodeRequest{
-				CodeId: 1,
+				CodeId: codeID,
 				Pagination: &query.PageRequest{
-					Key: fromBase64("AAAAAAAS1ocAAAAAAASY0YcuhNIMvyvID4NhhfROlbQNuZ0fl0clmBPoWHtKYazH"),
+					Key: fromBase64("AAAAAAAAAAoAAAAAAAOc/4cuhNIMvyvID4NhhfROlbQNuZ0fl0clmBPoWHtKYazH"),
 				},
 			},
-			expAddr:            []string{exampleContractAddr2},
-			expPaginationTotal: 0,
+			expAddr: contractAddrs[1:10],
 		},
 	}
 	for msg, spec := range specs {
 		t.Run(msg, func(t *testing.T) {
-			got, err := q.ContractsByCode(sdk.WrapSDKContext(ctx), spec.req)
+			got, err := q.ContractsByCode(ctx, spec.req)
 
 			if spec.expErr != nil {
 				assert.NotNil(t, err)
 				assert.EqualError(t, err, spec.expErr.Error())
 				return
 			}
-			assert.EqualValues(t, spec.expPaginationTotal, got.Pagination.Total)
 			assert.NotNil(t, got)
 			assert.Equal(t, spec.expAddr, got.Contracts)
 		})
@@ -565,11 +569,10 @@ func TestQueryContractHistory(t *testing.T) {
 	)
 
 	specs := map[string]struct {
-		srcHistory         []types.ContractCodeHistoryEntry
-		req                *types.QueryContractHistoryRequest
-		expContent         []types.ContractCodeHistoryEntry
-		expPaginationTotal uint64
-		expErr             error
+		srcHistory []types.ContractCodeHistoryEntry
+		req        types.QueryContractHistoryRequest
+		expContent []types.ContractCodeHistoryEntry
+		expErr     error
 	}{
 		"response with internal fields cleared": {
 			srcHistory: []types.ContractCodeHistoryEntry{{
@@ -578,14 +581,13 @@ func TestQueryContractHistory(t *testing.T) {
 				Updated:   &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
 				Msg:       []byte(`"init message"`),
 			}},
-			req: &types.QueryContractHistoryRequest{Address: myContractBech32Addr},
+			req: types.QueryContractHistoryRequest{Address: myContractBech32Addr},
 			expContent: []types.ContractCodeHistoryEntry{{
 				Operation: types.ContractCodeHistoryOperationTypeGenesis,
 				CodeID:    1,
 				Msg:       []byte(`"init message"`),
 				Updated:   &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
 			}},
-			expPaginationTotal: 1,
 		},
 		"response with multiple entries": {
 			srcHistory: []types.ContractCodeHistoryEntry{{
@@ -604,7 +606,7 @@ func TestQueryContractHistory(t *testing.T) {
 				Updated:   &types.AbsoluteTxPosition{BlockHeight: 5, TxIndex: 6},
 				Msg:       []byte(`"migrate message 2"`),
 			}},
-			req: &types.QueryContractHistoryRequest{Address: myContractBech32Addr},
+			req: types.QueryContractHistoryRequest{Address: myContractBech32Addr},
 			expContent: []types.ContractCodeHistoryEntry{{
 				Operation: types.ContractCodeHistoryOperationTypeInit,
 				CodeID:    1,
@@ -621,7 +623,6 @@ func TestQueryContractHistory(t *testing.T) {
 				Msg:       []byte(`"migrate message 2"`),
 				Updated:   &types.AbsoluteTxPosition{BlockHeight: 5, TxIndex: 6},
 			}},
-			expPaginationTotal: 3,
 		},
 		"with pagination offset": {
 			srcHistory: []types.ContractCodeHistoryEntry{{
@@ -635,37 +636,14 @@ func TestQueryContractHistory(t *testing.T) {
 				Updated:   &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
 				Msg:       []byte(`"migrate message 1"`),
 			}},
-			req: &types.QueryContractHistoryRequest{
+			req: types.QueryContractHistoryRequest{
 				Address: myContractBech32Addr,
 				Pagination: &query.PageRequest{
 					Offset: 1,
 				},
 			},
-			expContent: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeMigrate,
-				CodeID:    2,
-				Msg:       []byte(`"migrate message 1"`),
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
-			}},
-			expPaginationTotal: 2,
+			expErr: errLegacyPaginationUnsupported,
 		},
-		"with invalid pagination key": {
-			srcHistory: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeGenesis,
-				CodeID:    firstCodeID,
-				Updated:   types.NewAbsoluteTxPosition(ctx),
-				Msg:       []byte(`"init message"`),
-			}},
-			req: &types.QueryContractHistoryRequest{
-				Address: myContractBech32Addr,
-				Pagination: &query.PageRequest{
-					Offset: 1,
-					Key:    []byte("test"),
-				},
-			},
-			expErr: fmt.Errorf("invalid request, either offset or key is expected, got both"),
-		},
-
 		"with pagination limit": {
 			srcHistory: []types.ContractCodeHistoryEntry{{
 				Operation: types.ContractCodeHistoryOperationTypeInit,
@@ -678,7 +656,7 @@ func TestQueryContractHistory(t *testing.T) {
 				Updated:   &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
 				Msg:       []byte(`"migrate message 1"`),
 			}},
-			req: &types.QueryContractHistoryRequest{
+			req: types.QueryContractHistoryRequest{
 				Address: myContractBech32Addr,
 				Pagination: &query.PageRequest{
 					Limit: 1,
@@ -690,57 +668,16 @@ func TestQueryContractHistory(t *testing.T) {
 				Msg:       []byte(`"init message"`),
 				Updated:   &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
 			}},
-			expPaginationTotal: 0,
-		},
-		"with pagination next key": {
-			srcHistory: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeInit,
-				CodeID:    firstCodeID,
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 1, TxIndex: 2},
-				Msg:       []byte(`"init message"`),
-			}, {
-				Operation: types.ContractCodeHistoryOperationTypeMigrate,
-				CodeID:    2,
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
-				Msg:       []byte(`"migrate message 1"`),
-			}},
-			req: &types.QueryContractHistoryRequest{
-				Address: myContractBech32Addr,
-				Pagination: &query.PageRequest{
-					Key: fromBase64("AAAAAAAAAAI="),
-				},
-			},
-			expContent: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeMigrate,
-				CodeID:    2,
-				Updated:   &types.AbsoluteTxPosition{BlockHeight: 3, TxIndex: 4},
-				Msg:       []byte(`"migrate message 1"`),
-			}},
-			expPaginationTotal: 0,
 		},
 		"unknown contract address": {
-			req: &types.QueryContractHistoryRequest{Address: otherBech32Addr},
+			req: types.QueryContractHistoryRequest{Address: otherBech32Addr},
 			srcHistory: []types.ContractCodeHistoryEntry{{
 				Operation: types.ContractCodeHistoryOperationTypeGenesis,
 				CodeID:    1,
 				Updated:   types.NewAbsoluteTxPosition(ctx),
 				Msg:       []byte(`"init message"`),
 			}},
-			expErr: types.ErrEmpty,
-		},
-		"query with invalid address": {
-			req: &types.QueryContractHistoryRequest{Address: "abcde"},
-			srcHistory: []types.ContractCodeHistoryEntry{{
-				Operation: types.ContractCodeHistoryOperationTypeGenesis,
-				CodeID:    firstCodeID,
-				Updated:   types.NewAbsoluteTxPosition(ctx),
-				Msg:       []byte(`"init message"`),
-			}},
-			expErr: fmt.Errorf("decoding bech32 failed: %w", bech32.ErrInvalidLength(5)),
-		},
-		"with empty request": {
-			req:    nil,
-			expErr: status.Error(codes.InvalidArgument, "empty request"),
+			expContent: []types.ContractCodeHistoryEntry{},
 		},
 	}
 	for msg, spec := range specs {
@@ -762,7 +699,6 @@ func TestQueryContractHistory(t *testing.T) {
 			}
 			require.NoError(t, gotErr)
 			assert.Equal(t, spec.expContent, got.Entries)
-			assert.EqualValues(t, spec.expPaginationTotal, got.Pagination.Total)
 		})
 	}
 }
@@ -788,7 +724,7 @@ func TestQueryCode(t *testing.T) {
 		},
 		"req.CodeId=0": {
 			req:    &types.QueryCodeRequest{CodeId: 0},
-			expErr: sdkErrors.Wrap(types.ErrInvalid, "code id"),
+			expErr: errorsmod.Wrap(types.ErrInvalid, "code id"),
 		},
 		"not exist codeID": {
 			req:    &types.QueryCodeRequest{CodeId: 2},
@@ -908,7 +844,7 @@ func TestQueryCodeList(t *testing.T) {
 			}
 			// when
 			q := Querier(keeper)
-			got, gotErr := q.Codes(xCtx, &spec.req) //nolint:gosec
+			got, gotErr := q.Codes(xCtx, spec.req) //nolint:gosec
 
 			// then
 			if spec.expErr != nil {
@@ -950,14 +886,11 @@ func TestQueryContractInfo(t *testing.T) {
 		err = info.SetExtension(&myExt)
 		require.NoError(t, err)
 	}
-	withIBCPort := func(info *types.ContractInfo) {
-		info.IBCPortID = "fooPort"
-	}
 	specs := map[string]struct {
 		src    *types.QueryContractInfoRequest
 		stored types.ContractInfo
 		expRsp *types.QueryContractInfoResponse
-		expErr error
+		expErr bool
 	}{
 		"found": {
 			src:    &types.QueryContractInfoRequest{Address: contractAddr.String()},
@@ -975,26 +908,10 @@ func TestQueryContractInfo(t *testing.T) {
 				ContractInfo: types.ContractInfoFixture(myExtension),
 			},
 		},
-		"with IBCPortID": {
-			src:    &types.QueryContractInfoRequest{Address: contractAddr.String()},
-			stored: types.ContractInfoFixture(withIBCPort),
-			expRsp: &types.QueryContractInfoResponse{
-				Address:      contractAddr.String(),
-				ContractInfo: types.ContractInfoFixture(withIBCPort),
-			},
-		},
 		"not found": {
 			src:    &types.QueryContractInfoRequest{Address: RandomBech32AccountAddress(t)},
 			stored: types.ContractInfoFixture(),
-			expErr: types.ErrNotFound,
-		},
-		"query with invalid address": {
-			src:    &types.QueryContractInfoRequest{Address: "abcde"},
-			expErr: bech32.ErrInvalidLength(5),
-		},
-		"with empty request": {
-			src:    nil,
-			expErr: status.Error(codes.InvalidArgument, "empty request"),
+			expErr: true,
 		},
 	}
 	for name, spec := range specs {

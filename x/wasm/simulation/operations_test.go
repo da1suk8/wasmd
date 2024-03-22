@@ -41,7 +41,7 @@ func TestWeightedOperations(t *testing.T) {
 			want: simulation.WeightedOperations{
 				simulation.NewWeightedOperation(
 					wasmappparams.DefaultWeightMsgStoreCode,
-					SimulateMsgStoreCode(params.ak, params.bk, params.wasmKeeper, params.wasmBz, 5_000_000)),
+					SimulateMsgStoreCode(params.ak, params.bk, params.wasmKeeper, params.wasmBz)),
 				simulation.NewWeightedOperation(
 					wasmappparams.DefaultWeightMsgInstantiateContract,
 					SimulateMsgInstantiateContract(params.ak, params.bk, params.wasmKeeper, DefaultSimulationCodeIDSelector)),
@@ -56,7 +56,7 @@ func TestWeightedOperations(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := WeightedOperations(tt.args.simstate, tt.args.ak, tt.args.bk, tt.args.wasmKeeper)
+			got := WeightedOperations(tt.args.simstate.AppParams, tt.args.ak, tt.args.bk, tt.args.wasmKeeper)
 			for i := range got {
 				require.Equal(t, tt.want[i].Weight(), got[i].Weight(), "WeightedOperations().Weight()")
 

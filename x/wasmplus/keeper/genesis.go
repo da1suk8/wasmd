@@ -15,10 +15,8 @@ func InitGenesis(
 	ctx sdk.Context,
 	keeper *Keeper,
 	data types.GenesisState,
-	stakingKeeper wasmkeeper.ValidatorSetSource,
-	msgHandler sdk.Handler,
 ) ([]abci.ValidatorUpdate, error) {
-	result, err := wasmkeeper.InitGenesis(ctx, &keeper.Keeper, data.RawWasmState(), stakingKeeper, msgHandler)
+	result, err := wasmkeeper.InitGenesis(ctx, &keeper.Keeper, data.RawWasmState())
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "wasm")
 	}
@@ -44,7 +42,6 @@ func ExportGenesis(ctx sdk.Context, keeper *Keeper) *types.GenesisState {
 		Codes:     wasmState.Codes,
 		Contracts: wasmState.Contracts,
 		Sequences: wasmState.Sequences,
-		GenMsgs:   wasmState.GenMsgs,
 	}
 
 	keeper.IterateInactiveContracts(ctx, func(contractAddr sdk.AccAddress) (stop bool) {

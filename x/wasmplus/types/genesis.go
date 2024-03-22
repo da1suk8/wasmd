@@ -26,11 +26,6 @@ func (gs GenesisState) ValidateBasic() error {
 			return errorsmod.Wrapf(err, "sequence: %d", i)
 		}
 	}
-	for i := range gs.GenMsgs {
-		if err := gs.GenMsgs[i].ValidateBasic(); err != nil {
-			return errorsmod.Wrapf(err, "gen message: %d", i)
-		}
-	}
 	for i, addr := range gs.InactiveContractAddresses {
 		if _, err := sdk.AccAddressFromBech32(addr); err != nil {
 			return errorsmod.Wrapf(err, "inactive contract address: %d", i)
@@ -51,7 +46,6 @@ func (gs GenesisState) RawWasmState() wasmtypes.GenesisState {
 		Codes:     gs.Codes,
 		Contracts: gs.Contracts,
 		Sequences: gs.Sequences,
-		GenMsgs:   gs.GenMsgs,
 	}
 }
 

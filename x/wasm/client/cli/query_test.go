@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"testing"
 
+	errorsmod "cosmossdk.io/errors"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -17,8 +19,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	ocrpcmocks "github.com/Finschia/ostracon/rpc/client/mocks"
-	ocrpctypes "github.com/Finschia/ostracon/rpc/core/types"
+	cmtrpcmocks "github.com/cometbft/cometbft/rpc/client/mocks"
+	cmtrpctypes "github.com/cometbft/cometbft/rpc/core/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -35,7 +37,7 @@ var (
 	argsWithAddr        = []string{accAddress}
 	badStatusError      = status.Error(codes.Unknown, "")
 	invalidRequestFlags = []string{"--page=2", "--offset=1"}
-	invalidRequestError = sdkerrors.Wrap(sdkerrors.ErrInvalidRequest,
+	invalidRequestError = errorsmod.Wrap(sdkerrors.ErrInvalidRequest,
 		"page and offset cannot be used together")
 	invalidNodeFlags   = []string{"--node=" + string(rune(0))}
 	invalidControlChar = &url.Error{
@@ -380,8 +382,8 @@ func TestGetCmdListPinnedCode(t *testing.T) {
 }
 
 func makeContext(bz []byte) context.Context {
-	result := ocrpctypes.ResultABCIQuery{Response: abci.ResponseQuery{Value: bz}}
-	mockClient := ocrpcmocks.RemoteClient{}
+	result := cmtrpctypes.ResultABCIQuery{Response: abci.ResponseQuery{Value: bz}}
+	mockClient := cmtrpcmocks.Client{}
 	{
 		// #1
 		mockClient.On("ABCIQueryWithOptions",

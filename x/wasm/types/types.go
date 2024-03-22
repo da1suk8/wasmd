@@ -424,11 +424,8 @@ func isSubset(super, sub []string) bool {
 
 // AllAuthorizedAddresses returns the list of authorized addresses. Can be empty.
 func (a AccessConfig) AllAuthorizedAddresses() []string {
-	switch a.Permission {
-	case AccessTypeAnyOfAddresses:
+	if a.Permission == AccessTypeAnyOfAddresses {
 		return a.Addresses
-	case AccessTypeOnlyAddress:
-		return []string{a.Address}
 	}
 	return []string{}
 }

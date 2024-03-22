@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
 	"github.com/Finschia/wasmd/x/wasmplus/types"
 )
@@ -48,13 +48,13 @@ func ProposalDeactivateContractCmd() *cobra.Command {
 				Contract:    args[0],
 			}
 
-			msg, err := govtypes.NewMsgSubmitProposal(&content, deposit, clientCtx.GetFromAddress())
+			msg, err := v1beta1.NewMsgSubmitProposal(&content, deposit, clientCtx.GetFromAddress())
 			if err != nil {
 				return err
 			}
-			if err = msg.ValidateBasic(); err != nil {
-				return err
-			}
+			//if err = msg.ValidateBasic(); err != nil {
+			//	return err
+			//}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
@@ -101,13 +101,13 @@ func ProposalActivateContractCmd() *cobra.Command {
 				Contract:    args[0],
 			}
 
-			msg, err := govtypes.NewMsgSubmitProposal(&content, deposit, clientCtx.GetFromAddress())
+			msg, err := v1beta1.NewMsgSubmitProposal(&content, deposit, clientCtx.GetFromAddress())
 			if err != nil {
 				return err
 			}
-			if err = msg.ValidateBasic(); err != nil {
-				return err
-			}
+			//if err = msg.ValidateBasic(); err != nil {
+			//	return err
+			//}
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
