@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Finschia/finschia-sdk/types/module"
-	"github.com/Finschia/finschia-sdk/x/simulation"
+	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/cosmos/cosmos-sdk/x/simulation"
 
 	wasmappparams "github.com/Finschia/wasmd/app/params"
 	"github.com/Finschia/wasmd/x/wasm/keeper"

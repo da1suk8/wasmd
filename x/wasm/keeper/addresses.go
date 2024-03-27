@@ -5,8 +5,8 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	sdk "github.com/Finschia/finschia-sdk/types"
-	"github.com/Finschia/finschia-sdk/types/address"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/address"
 
 	"github.com/Finschia/wasmd/x/wasm/types"
 )

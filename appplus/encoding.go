@@ -1,7 +1,7 @@
 package appplus
 
 import (
-	"github.com/Finschia/finschia-sdk/std"
+	"github.com/cosmos/cosmos-sdk/std"
 
 	"github.com/Finschia/wasmd/app/params"
 )
