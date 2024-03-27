@@ -3,9 +3,11 @@ package types
 import (
 	"fmt"
 
-	sdk "github.com/Finschia/finschia-sdk/types"
-	sdkerrors "github.com/Finschia/finschia-sdk/types/errors"
-	govtypes "github.com/Finschia/finschia-sdk/x/gov/types"
+	errorsmod "cosmossdk.io/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
 	wasmtypes "github.com/Finschia/wasmd/x/wasm/types"
 )
@@ -21,8 +23,8 @@ var EnableAllProposals = append([]wasmtypes.ProposalType{
 }, wasmtypes.EnableAllProposals...)
 
 func init() {
-	govtypes.RegisterProposalType(string(ProposalTypeDeactivateContract))
-	govtypes.RegisterProposalType(string(ProposalTypeActivateContract))
+	v1beta1.RegisterProposalType(string(ProposalTypeDeactivateContract))
+	v1beta1.RegisterProposalType(string(ProposalTypeActivateContract))
 }
 
 func (p DeactivateContractProposal) GetTitle() string { return p.Title }
@@ -37,7 +39,7 @@ func (p DeactivateContractProposal) ProposalType() string {
 
 func (p DeactivateContractProposal) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(p.Contract); err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "contract")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "contract")
 	}
 
 	return nil
@@ -63,7 +65,7 @@ func (p ActivateContractProposal) ProposalType() string {
 
 func (p ActivateContractProposal) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(p.Contract); err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "contract")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "contract")
 	}
 
 	return nil
