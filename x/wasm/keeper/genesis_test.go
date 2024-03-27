@@ -686,7 +686,7 @@ func setupKeeper(t *testing.T) (*Keeper, sdk.Context) {
 		encodingConfig.Codec,
 		runtime.NewKVStoreService(keyWasm),
 		authkeeper.AccountKeeper{},
-		&bankpluskeeper.BaseKeeper{},
+		&bankkeeper.BaseKeeper{},
 		stakingkeeper.Keeper{},
 		nil,
 		nil,

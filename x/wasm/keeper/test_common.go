@@ -304,7 +304,7 @@ func createTestInput(
 	}
 	require.NoError(t, accountKeeper.Params.Set(ctx, authtypes.DefaultParams()))
 
-	bankKeeper := bankpluskeeper.NewBaseKeeper(
+	bankKeeper := bankkeeper.NewBaseKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[banktypes.StoreKey]),
 		accountKeeper,
