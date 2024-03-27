@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/stretchr/testify/suite"
-	dbm "github.com/tendermint/tm-db"
 
 	"github.com/Finschia/finschia-sdk/crypto/hd"
 	"github.com/Finschia/finschia-sdk/crypto/keyring"

@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
+	abci "github.com/cometbft/cometbft/abci/types"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	abci "github.com/tendermint/tendermint/abci/types"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	sdk "github.com/Finschia/finschia-sdk/types"
 
@@ -23,7 +23,7 @@ var wasmContract []byte
 
 func TestStoreAndInstantiateContract(t *testing.T) {
 	wasmApp := appplus.Setup(false)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{Time: time.Now()})
+	ctx := wasmApp.BaseApp.NewContext(false, cmtproto.Header{Time: time.Now()})
 
 	var myAddress sdk.AccAddress = make([]byte, wasmtypes.ContractAddrLen)
 

@@ -3,9 +3,9 @@ package wasmplus_test
 import (
 	"testing"
 
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	sdk "github.com/Finschia/finschia-sdk/types"
 	"github.com/Finschia/finschia-sdk/types/module"
@@ -17,7 +17,7 @@ import (
 
 func TestAppPlusModuleMigrations(t *testing.T) {
 	wasmApp := appplus.Setup(false)
-	ctx := wasmApp.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := wasmApp.BaseApp.NewContext(false, cmtproto.Header{})
 	upgradeHandler := func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		return wasmApp.ModuleManager().RunMigrations(ctx, wasmApp.ModuleConfigurator(), fromVM)
 	}
