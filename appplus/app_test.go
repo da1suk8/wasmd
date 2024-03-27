@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"cosmossdk.io/log"
 	"github.com/Finschia/finschia-sdk/server"
-	"github.com/Finschia/ostracon/libs/log"
 
 	wasmapp "github.com/Finschia/wasmd/app"
 	wasmkeeper "github.com/Finschia/wasmd/x/wasm/keeper"

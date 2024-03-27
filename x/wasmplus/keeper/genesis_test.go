@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/proto/tendermint/crypto"
 
+	"cosmossdk.io/log"
 	"github.com/Finschia/finschia-sdk/store"
 	sdk "github.com/Finschia/finschia-sdk/types"
 	authkeeper "github.com/Finschia/finschia-sdk/x/auth/keeper"
@@ -26,7 +27,6 @@ import (
 	paramskeeper "github.com/Finschia/finschia-sdk/x/params/keeper"
 	paramstypes "github.com/Finschia/finschia-sdk/x/params/types"
 	stakingkeeper "github.com/Finschia/finschia-sdk/x/staking/keeper"
-	"github.com/Finschia/ostracon/libs/log"
 
 	"github.com/Finschia/wasmd/x/wasm/keeper"
 	wasmkeeper "github.com/Finschia/wasmd/x/wasm/keeper"

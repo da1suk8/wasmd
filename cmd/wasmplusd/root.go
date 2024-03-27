@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"cosmossdk.io/log"
 	"github.com/Finschia/finschia-sdk/baseapp"
 	"github.com/Finschia/finschia-sdk/client"
 	"github.com/Finschia/finschia-sdk/client/config"
@@ -31,7 +32,6 @@ import (
 	"github.com/Finschia/finschia-sdk/x/crisis"
 	genutilcli "github.com/Finschia/finschia-sdk/x/genutil/client/cli"
 	tmcli "github.com/Finschia/ostracon/libs/cli"
-	"github.com/Finschia/ostracon/libs/log"
 
 	"github.com/Finschia/wasmd/app/params"
 	"github.com/Finschia/wasmd/appplus"

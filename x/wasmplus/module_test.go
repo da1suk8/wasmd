@@ -16,8 +16,8 @@ import (
 	authkeeper "github.com/Finschia/finschia-sdk/x/auth/keeper"
 	bankkeeper "github.com/Finschia/finschia-sdk/x/bank/keeper"
 	stakingkeeper "github.com/Finschia/finschia-sdk/x/staking/keeper"
-	"github.com/Finschia/ostracon/crypto"
-	"github.com/Finschia/ostracon/crypto/ed25519"
+	"github.com/cometbft/cometbft/crypto"
+	"github.com/cometbft/cometbft/crypto/ed25519"
 
 	wasmkeeper "github.com/Finschia/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/Finschia/wasmd/x/wasm/types"

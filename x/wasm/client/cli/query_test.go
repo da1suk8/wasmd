@@ -20,8 +20,8 @@ import (
 	"github.com/Finschia/finschia-sdk/client"
 	"github.com/Finschia/finschia-sdk/codec"
 	sdkerrors "github.com/Finschia/finschia-sdk/types/errors"
-	ocrpcmocks "github.com/Finschia/ostracon/rpc/client/mocks"
-	ocrpctypes "github.com/Finschia/ostracon/rpc/core/types"
+	cmtrpcmocks "github.com/cometbft/cometbft/rpc/client/mocks"
+	cmtrpctypes "github.com/cometbft/cometbft/rpc/core/types"
 
 	"github.com/Finschia/wasmd/x/wasm/types"
 )
@@ -380,8 +380,8 @@ func TestGetCmdListPinnedCode(t *testing.T) {
 }
 
 func makeContext(bz []byte) context.Context {
-	result := ocrpctypes.ResultABCIQuery{Response: abci.ResponseQuery{Value: bz}}
-	mockClient := ocrpcmocks.RemoteClient{}
+	result := cmtrpctypes.ResultABCIQuery{Response: abci.ResponseQuery{Value: bz}}
+	mockClient := cmtrpcmocks.Client{}
 	{
 		// #1
 		mockClient.On("ABCIQueryWithOptions",

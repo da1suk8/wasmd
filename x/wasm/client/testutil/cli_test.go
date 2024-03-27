@@ -18,7 +18,7 @@ import (
 	"github.com/Finschia/finschia-sdk/testutil/network"
 	sdk "github.com/Finschia/finschia-sdk/types"
 	authtypes "github.com/Finschia/finschia-sdk/x/auth/types"
-	ostrand "github.com/Finschia/ostracon/libs/rand"
+	"github.com/cometbft/cometbft/libs/rand"
 
 	wasmapp "github.com/Finschia/wasmd/app"
 	"github.com/Finschia/wasmd/app/params"
@@ -43,7 +43,7 @@ func DefaultConfig() network.Config {
 		AppConstructor:    NewAppConstructor(encCfg),
 		GenesisState:      wasmapp.ModuleBasics.DefaultGenesis(encCfg.Marshaler),
 		TimeoutCommit:     1 * time.Second,
-		ChainID:           "chain-" + ostrand.NewRand().Str(6),
+		ChainID:           "chain-" + rand.NewRand().Str(6),
 		NumValidators:     4,
 		BondDenom:         sdk.DefaultBondDenom,
 		MinGasPrices:      fmt.Sprintf("0.000006%s", sdk.DefaultBondDenom),

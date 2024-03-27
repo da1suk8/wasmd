@@ -6,7 +6,7 @@ import (
 	abci "github.com/cometbft/cometbft/abci/types"
 	dbm "github.com/cosmos/cosmos-db"
 
-	"github.com/Finschia/ostracon/libs/log"
+	"cosmossdk.io/log"
 
 	wasmapp "github.com/Finschia/wasmd/app"
 	"github.com/Finschia/wasmd/x/wasm"
