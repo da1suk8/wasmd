@@ -143,7 +143,7 @@ In order for imports to properly compile in your IDE, you may need to manually s
 
 For example, in vscode your `.vscode/settings.json` should look like:
 
-```
+```json
 {
     "protoc": {
         "options": [
