@@ -3,6 +3,7 @@ package lbm.wasm.v1;
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
 import "cosmwasm/wasm/v1/types.proto";
 import "amino/amino.proto";
 
@@ -11,6 +12,8 @@ option (gogoproto.goproto_getters_all) = false;
 
 // Msg defines the wasm Msg service for finschia-sdk.
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+
   // StoreCodeAndInstantiateContract upload code and instantiate a contract
   // using it
   rpc StoreCodeAndInstantiateContract(MsgStoreCodeAndInstantiateContract)
