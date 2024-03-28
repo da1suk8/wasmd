@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -13,6 +14,13 @@ import (
 )
 
 func TestParseAccessConfigUpdates(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "pub")
+	config.SetBech32PrefixForValidator("link", "pub")
+	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetCoinType(438)
+	config.Seal()
+
 	specs := map[string]struct {
 		src    []string
 		exp    []types.AccessConfigUpdate

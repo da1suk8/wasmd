@@ -151,20 +151,22 @@ func TestMsgJsonSignBytes(t *testing.T) {
 				InstantiatePermission: &wasmTypes.AccessConfig{Permission: wasmTypes.AccessTypeAnyOfAddresses, Addresses: []string{"address1", "address2"}},
 				Admin:                 "admin1", Label: "My", Msg: wasmTypes.RawContractMessage(myInnerMsg), Funds: sdk.Coins{{Denom: "denom1", Amount: sdkmath.NewInt(1)}},
 			},
-			exp: `
-{
-	"type":"wasm/MsgStoreCodeAndInstantiateContract",
-	"value": {"admin":"admin1","funds":[{"amount":"1","denom":"denom1"}],"instantiate_permission":{"addresses":["address1","address2"],
-		"permission":"AnyOfAddresses"},"label":"My","msg":{"foo":"bar"},"sender":"sender1","wasm_byte_code":"WUVMTE9XIFNVQk1BUklORQ=="}
-}`,
+			exp: `{
+				"admin": "admin1",
+				"funds": [{"amount": "1", "denom": "denom1"}],
+				"instantiate_permission": {
+					"addresses": ["address1", "address2"],
+					"permission": "AnyOfAddresses"
+				},
+				"label": "My",
+				"msg": {"foo": "bar"},
+				"sender": "sender1",
+				"wasm_byte_code": "WUVMTE9XIFNVQk1BUklORQ=="
+			}`,
 		},
 		"MsgInstantiateContract with minimum field": {
 			src: &MsgStoreCodeAndInstantiateContract{},
-			exp: `
-{
-	"type":"wasm/MsgStoreCodeAndInstantiateContract",
-	"value": {"funds":[]}
-}`,
+			exp: `{"funds": []}`,
 		},
 	}
 	for name, spec := range specs {

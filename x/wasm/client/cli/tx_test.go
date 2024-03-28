@@ -77,6 +77,13 @@ func TestParseVerificationFlags(t *testing.T) {
 }
 
 func TestParseAccessConfigFlags(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "pub")
+	config.SetBech32PrefixForValidator("link", "pub")
+	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetCoinType(438)
+	config.Seal()
+
 	specs := map[string]struct {
 		args   []string
 		expCfg *types.AccessConfig

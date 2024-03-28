@@ -98,6 +98,13 @@ func TestValidateProposalCommons(t *testing.T) {
 }
 
 func TestValidateStoreCodeProposal(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "pub")
+	config.SetBech32PrefixForValidator("link", "pub")
+	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetCoinType(438)
+	config.Seal()
+
 	var anyAddress sdk.AccAddress = bytes.Repeat([]byte{0x0}, ContractAddrLen)
 
 	specs := map[string]struct {

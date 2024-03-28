@@ -23,6 +23,7 @@ import (
 	cmtrpctypes "github.com/cometbft/cometbft/rpc/core/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/Finschia/wasmd/x/wasm/types"
@@ -199,6 +200,13 @@ func TestGetCmdQueryCodeInfo(t *testing.T) {
 }
 
 func TestGetCmdGetContractInfo(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "pub")
+	config.SetBech32PrefixForValidator("link", "pub")
+	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetCoinType(438)
+	config.Seal()
+
 	res := types.QueryContractInfoResponse{}
 	bz, err := res.Marshal()
 	require.NoError(t, err)
@@ -241,6 +249,13 @@ func TestGetCmdGetContractState(t *testing.T) {
 }
 
 func TestGetCmdGetContractStateAll(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "pub")
+	config.SetBech32PrefixForValidator("link", "pub")
+	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetCoinType(438)
+	config.Seal()
+
 	res := types.QueryAllContractStateResponse{}
 	bz, err := res.Marshal()
 	require.NoError(t, err)
@@ -269,6 +284,13 @@ func TestGetCmdGetContractStateAll(t *testing.T) {
 }
 
 func TestGetCmdGetContractStateRaw(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "pub")
+	config.SetBech32PrefixForValidator("link", "pub")
+	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetCoinType(438)
+	config.Seal()
+
 	res := types.QueryRawContractStateResponse{}
 	bz, err := res.Marshal()
 	require.NoError(t, err)
@@ -298,6 +320,13 @@ func TestGetCmdGetContractStateRaw(t *testing.T) {
 }
 
 func TestGetCmdGetContractStateSmart(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "pub")
+	config.SetBech32PrefixForValidator("link", "pub")
+	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetCoinType(438)
+	config.Seal()
+
 	res := types.QueryRawContractStateResponse{}
 	bz, err := res.Marshal()
 	require.NoError(t, err)
@@ -327,6 +356,13 @@ func TestGetCmdGetContractStateSmart(t *testing.T) {
 }
 
 func TestGetCmdGetContractHistory(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "pub")
+	config.SetBech32PrefixForValidator("link", "pub")
+	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetCoinType(438)
+	config.Seal()
+
 	res := types.QueryContractHistoryResponse{}
 	bz, err := res.Marshal()
 	require.NoError(t, err)

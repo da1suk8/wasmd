@@ -18,6 +18,13 @@ import (
 const invalidAddress = "invalid address"
 
 func TestValidateGenesisState(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "pub")
+	config.SetBech32PrefixForValidator("link", "pub")
+	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetCoinType(438)
+	config.Seal()
+
 	specs := map[string]struct {
 		srcMutator func(*GenesisState)
 		expError   bool
@@ -64,6 +71,13 @@ func TestValidateGenesisState(t *testing.T) {
 }
 
 func TestCodeValidateBasic(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "pub")
+	config.SetBech32PrefixForValidator("link", "pub")
+	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetCoinType(438)
+	config.Seal()
+
 	specs := map[string]struct {
 		srcMutator func(*Code)
 		expError   bool
@@ -114,6 +128,13 @@ func TestCodeValidateBasic(t *testing.T) {
 }
 
 func TestContractValidateBasic(t *testing.T) {
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "pub")
+	config.SetBech32PrefixForValidator("link", "pub")
+	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetCoinType(438)
+	config.Seal()
+
 	specs := map[string]struct {
 		srcMutator func(*Contract)
 		expError   bool
