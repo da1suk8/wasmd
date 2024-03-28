@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased](https://github.com/Finschia/wasmd/compare/v0.2.0...HEAD)
+## [Unreleased](https://github.com/Finschia/wasmd/compare/v0.3.0...HEAD)
 
 ### Features
 
@@ -11,6 +11,15 @@
 ### Breaking Changes
 
 ### Build, CI
+
+### Document Updates
+
+
+## [v0.3.0](https://github.com/Finschia/wasmd/releases/tag/v0.3.0) - 2024.02.27
+
+### Breaking Changes
+* [\#118](https://github.com/Finschia/wasmd/pull/118) disable custom query
+* [\#117](https://github.com/Finschia/wasmd/pull/117) version-up depending wasmvm to v1.1.1-0.12.0
 
 ### Document Updates
 * [\#113](https://github.com/Finschia/wasmd/pull/113) add compatibility of wasmd v0.2
