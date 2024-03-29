@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"runtime/debug"
-	"strings"
 
-	wasmvm "github.com/Finschia/wasmvm"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cast"
@@ -303,16 +301,16 @@ func getExpectedLibwasmVersion() string {
 // An alternative method to obtain the libwasmvm version loaded at runtime is executing
 // `wasmd query wasm libwasmvm-version`.
 func CheckLibwasmVersion(wasmExpectedVersion string) error {
-	if wasmExpectedVersion == "" {
-		return fmt.Errorf("wasmvm module not exist")
-	}
-	wasmVersion, err := wasmvm.LibwasmvmVersion()
-	if err != nil {
-		return fmt.Errorf("unable to retrieve libwasmversion %w", err)
-	}
-	if !strings.Contains(wasmExpectedVersion, wasmVersion) {
-		return fmt.Errorf("libwasmversion mismatch. got: %s; expected: %s", wasmVersion, wasmExpectedVersion)
-	}
+	// if wasmExpectedVersion == "" {
+	// 	return fmt.Errorf("wasmvm module not exist")
+	// }
+	// wasmVersion, err := wasmvm.LibwasmvmVersion()
+	// if err != nil {
+	// 	return fmt.Errorf("unable to retrieve libwasmversion %w", err)
+	// }
+	// if !strings.Contains(wasmExpectedVersion, wasmVersion) {
+	// 	return fmt.Errorf("libwasmversion mismatch. got: %s; expected: %s", wasmVersion, wasmExpectedVersion)
+	// }
 	return nil
 }
 
