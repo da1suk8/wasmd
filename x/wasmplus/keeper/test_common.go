@@ -83,6 +83,7 @@ import (
 	wasmappparams "github.com/Finschia/wasmd/app/params"
 	"github.com/Finschia/wasmd/x/wasm/keeper/wasmtesting"
 	wasmtypes "github.com/Finschia/wasmd/x/wasm/types"
+	wasmplustypes "github.com/Finschia/wasmd/x/wasmplus/types"
 )
 
 var moduleBasics = module.NewBasicManager(
@@ -119,9 +120,9 @@ func MakeEncodingConfig(_ testing.TB) wasmappparams.EncodingConfig {
 
 	moduleBasics.RegisterLegacyAminoCodec(amino)
 	moduleBasics.RegisterInterfaces(interfaceRegistry)
-	// add wasmd types
-	wasmtypes.RegisterInterfaces(interfaceRegistry)
-	wasmtypes.RegisterLegacyAminoCodec(amino)
+	// add wasmplusd types
+	wasmplustypes.RegisterInterfaces(interfaceRegistry)
+	wasmplustypes.RegisterLegacyAminoCodec(amino)
 
 	return encodingConfig
 }
