@@ -244,7 +244,7 @@ func (k Keeper) instantiate(
 	addressGenerator AddressGenerator,
 	authPolicy types.AuthorizationPolicy,
 ) (sdk.AccAddress, []byte, error) {
-	defer func(begin time.Time) { k.metrics.InstantiateElapsedTimes.Observe(time.Since(begin).Seconds()) }(time.Now())
+	defer telemetry.MeasureSince(time.Now(), "wasm", "contract", "instantiate")
 
 	if creator == nil {
 		return nil, nil, types.ErrEmpty.Wrap("creator")
