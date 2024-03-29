@@ -874,6 +874,11 @@ func NewWasmApp(
 
 	app.sm.RegisterStoreDecoders()
 
+	// initialize stores
+	app.MountKVStores(keys)
+	// app.MountTransientStores(tkeys)
+	app.MountMemoryStores(memKeys)
+
 	// initialize BaseApp
 	app.SetInitChainer(app.InitChainer)
 	app.SetPreBlocker(app.PreBlocker)
