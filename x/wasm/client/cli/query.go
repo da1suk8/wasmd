@@ -144,7 +144,7 @@ func GetCmdListCode() *cobra.Command {
 		SilenceUsage: true,
 	}
 	flags.AddQueryFlagsToCmd(cmd)
-	addPaginationFlags(cmd, "list codes")
+	flags.AddPaginationFlagsToCmd(cmd, "list codes")
 	return cmd
 }
 
@@ -190,7 +190,7 @@ func GetCmdListContractByCode() *cobra.Command {
 		SilenceUsage: true,
 	}
 	flags.AddQueryFlagsToCmd(cmd)
-	addPaginationFlags(cmd, "list contracts by code")
+	flags.AddPaginationFlagsToCmd(cmd, "list contracts by code")
 	return cmd
 }
 
@@ -307,7 +307,6 @@ func GetCmdGetContractInfo() *cobra.Command {
 			}
 			return clientCtx.PrintProto(res)
 		},
-		SilenceUsage: true,
 	}
 	flags.AddQueryFlagsToCmd(cmd)
 	return cmd

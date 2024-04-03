@@ -142,6 +142,14 @@ func SetupWithGenesisValSet(
 func NewWasmAppWithCustomOptions(t *testing.T, isCheckTx bool, options SetupOptions) *WasmPlusApp {
 	t.Helper()
 
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "linkpub")
+	config.SetBech32PrefixForValidator("linkvaloper", "linkvaloperpub")
+	config.SetBech32PrefixForConsensusNode("linkvalcons", "linkvalconspub")
+	config.SetPurpose(44)
+	config.SetCoinType(438)
+	config.Seal()
+
 	privVal := mock.NewPV()
 	pubKey, err := privVal.GetPubKey()
 	require.NoError(t, err)

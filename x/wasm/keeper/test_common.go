@@ -289,13 +289,15 @@ func createTestInput(
 		types.ModuleName:               {authtypes.Burner},
 	}
 
+	bech32MainPrefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
+
 	accountKeeper := authkeeper.NewAccountKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[authtypes.StoreKey]),
 		authtypes.ProtoBaseAccount,
 		maccPerms,
-		authcodec.NewBech32Codec(sdk.Bech32MainPrefix),
-		sdk.Bech32MainPrefix,
+		authcodec.NewBech32Codec(bech32MainPrefix),
+		bech32MainPrefix,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 	blockedAddrs := make(map[string]bool)

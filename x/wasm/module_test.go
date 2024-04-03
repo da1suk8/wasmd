@@ -62,6 +62,10 @@ type testData struct {
 
 func setupTest(t *testing.T) testData {
 	t.Helper()
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount("link", "linkpub")
+
 	DefaultParams := v2.Params{
 		CodeUploadAccess:             v2.AccessConfig{Permission: v2.AccessTypeEverybody},
 		InstantiateDefaultPermission: v2.AccessTypeEverybody,
