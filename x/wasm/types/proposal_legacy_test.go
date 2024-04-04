@@ -99,9 +99,9 @@ func TestValidateProposalCommons(t *testing.T) {
 
 func TestValidateStoreCodeProposal(t *testing.T) {
 	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount("link", "pub")
-	config.SetBech32PrefixForValidator("link", "pub")
-	config.SetBech32PrefixForConsensusNode("link", "pub")
+	config.SetBech32PrefixForAccount("link", "linkpub")
+	config.SetBech32PrefixForValidator("linkvaloper", "linkvaloperpub")
+	config.SetBech32PrefixForConsensusNode("linkvalcons", "linkvalconspub")
 	config.SetCoinType(438)
 	config.Seal()
 
