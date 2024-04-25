@@ -3,6 +3,7 @@
 ## [Unreleased](https://github.com/Finschia/wasmd/compare/v0.3.0...HEAD)
 
 ### Features
+* [\#123](https://github.com/Finschia/wasmd/pull/123) prevent fswap and fbridge module in Submessages
 
 ### Improvements
 
