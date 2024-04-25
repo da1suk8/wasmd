@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"sort"
+	"strings"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -81,6 +82,14 @@ func (d MessageDispatcher) dispatchMsgWithGasLimit(ctx sdk.Context, contractAddr
 func (d MessageDispatcher) DispatchSubmessages(ctx sdk.Context, contractAddr sdk.AccAddress, ibcPort string, msgs []wasmvmtypes.SubMsg) ([]byte, error) {
 	var rsp []byte
 	for _, msg := range msgs {
+
+		// Prevent the use of fswap and fbridge module in Submessages
+		// https://github.com/Finschia/finschia-sdk/pull/1336, https://github.com/Finschia/finschia-sdk/pull/1340
+		if stargateMsg := msg.Msg.Stargate; stargateMsg != nil &&
+			(strings.Contains(stargateMsg.TypeURL, "lbm.fswap.v1") || strings.Contains(stargateMsg.TypeURL, "lbm.fbridge.v1")) {
+			return nil, sdkerrors.Wrap(types.ErrUnsupportedForContract, "fswap and fbridge not supported of Stargate")
+		}
+
 		switch msg.ReplyOn {
 		case wasmvmtypes.ReplySuccess, wasmvmtypes.ReplyError, wasmvmtypes.ReplyAlways, wasmvmtypes.ReplyNever:
 		default:

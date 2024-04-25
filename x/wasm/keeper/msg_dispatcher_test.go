@@ -386,6 +386,14 @@ func TestDispatchSubmessages(t *testing.T) {
 				sdk.NewEvent("stargate-reply"),
 			},
 		},
+		"stargate msg with invalid fswap TypeURL": {
+			msgs:   []wasmvmtypes.SubMsg{{Msg: wasmvmtypes.CosmosMsg{Stargate: &wasmvmtypes.StargateMsg{TypeURL: "/lbm.fswap.v1.MsgSwapRequest"}}}},
+			expErr: true,
+		},
+		"stargate msg with invalid fbridge TypeURL": {
+			msgs:   []wasmvmtypes.SubMsg{{Msg: wasmvmtypes.CosmosMsg{Stargate: &wasmvmtypes.StargateMsg{TypeURL: "/lbm.fbridge.v1.MsgTransfer"}}}},
+			expErr: true,
+		},
 	}
 	for name, spec := range specs {
 		t.Run(name, func(t *testing.T) {
