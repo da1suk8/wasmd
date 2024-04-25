@@ -87,10 +87,10 @@ func (d MessageDispatcher) DispatchSubmessages(ctx sdk.Context, contractAddr sdk
 		// https://github.com/Finschia/finschia-sdk/pull/1336, https://github.com/Finschia/finschia-sdk/pull/1340
 		if stargateMsg := msg.Msg.Stargate; stargateMsg != nil {
 			if strings.HasPrefix(stargateMsg.TypeURL, "/lbm.fswap.v1") {
-				return nil, sdkerrors.Wrap(types.ErrUnsupportedForContract, "fswap not supported of Stargate")
+				return nil, sdkerrors.Wrap(types.ErrUnsupportedForContract, "fswap not supported by Stargate")
 			}
 			if strings.HasPrefix(stargateMsg.TypeURL, "/lbm.fbridge.v1") {
-				return nil, sdkerrors.Wrap(types.ErrUnsupportedForContract, "fbridge not supported of Stargate")
+				return nil, sdkerrors.Wrap(types.ErrUnsupportedForContract, "fbridge not supported by Stargate")
 			}
 		}
 
