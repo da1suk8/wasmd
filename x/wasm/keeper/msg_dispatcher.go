@@ -83,14 +83,14 @@ func (d MessageDispatcher) DispatchSubmessages(ctx sdk.Context, contractAddr sdk
 	var rsp []byte
 	for _, msg := range msgs {
 
-		// Prevent the use of fswap and fbridge module in Submessages
+		// Prevent the use of specific modules in Submessages
 		// https://github.com/Finschia/finschia-sdk/pull/1336, https://github.com/Finschia/finschia-sdk/pull/1340
 		if stargateMsg := msg.Msg.Stargate; stargateMsg != nil {
-			if strings.HasPrefix(stargateMsg.TypeURL, "/lbm.fswap.v1") {
-				return nil, sdkerrors.Wrap(types.ErrUnsupportedForContract, "fswap not supported by Stargate")
-			}
-			if strings.HasPrefix(stargateMsg.TypeURL, "/lbm.fbridge.v1") {
-				return nil, sdkerrors.Wrap(types.ErrUnsupportedForContract, "fbridge not supported by Stargate")
+			deniedModules := []string{"/lbm.fswap.v1", "/lbm.fbridge.v1"}
+			for _, moduleName := range deniedModules {
+				if strings.HasPrefix(stargateMsg.TypeURL, moduleName) {
+					return nil, sdkerrors.Wrap(types.ErrUnsupportedForContract, moduleName+" not supported by Stargate")
+				}
 			}
 		}
 
